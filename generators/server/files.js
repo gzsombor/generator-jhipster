@@ -445,6 +445,7 @@ function writeFiles() {
 
             this.template(SERVER_MAIN_SRC_DIR + 'package/web/rest/util/_HeaderUtil.java', javaDir + 'web/rest/util/HeaderUtil.java', this, {});
             this.template(SERVER_MAIN_SRC_DIR + 'package/web/rest/util/_PaginationUtil.java', javaDir + 'web/rest/util/PaginationUtil.java', this, {});
+            this.template(SERVER_MAIN_SRC_DIR + 'package/web/rest/util/_ResponseUtil.java', javaDir + 'web/rest/util/ResponseUtil.java', this, {});
             this.template(SERVER_MAIN_SRC_DIR + 'package/web/rest/_package-info.java', javaDir + 'web/rest/package-info.java', this, {});
 
             this.template(SERVER_MAIN_SRC_DIR + 'package/web/rest/_LogsResource.java', javaDir + 'web/rest/LogsResource.java', this, {});

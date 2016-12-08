@@ -10,6 +10,7 @@ import <%=packageName%>.repository.<%= entityClass %>Repository;<% if (searchEng
 import <%=packageName%>.repository.search.<%= entityClass %>SearchRepository;<% }} %>
 import <%=packageName%>.web.rest.util.HeaderUtil;<% if (pagination != 'no') { %>
 import <%=packageName%>.web.rest.util.PaginationUtil;<% } %>
+import <%=packageName%>.web.rest.util.ResponseUtil;
 <%_ if (dto == 'mapstruct') { _%>
 import <%=packageName%>.service.dto.<%= entityClass %>DTO;
 <%_ if (service == 'no') { _%>
@@ -112,11 +113,7 @@ public class <%= entityClass %>Resource {
     @Timed
     public ResponseEntity<<%= instanceType %>> get<%= entityClass %>(@PathVariable <%= pkType %> id) {
         log.debug("REST request to get <%= entityClass %> : {}", id);<%- include('../../common/get_template', {viaService: viaService}); -%>
-        return Optional.ofNullable(<%= instanceName %>)
-            .map(result -> new ResponseEntity<>(
-                result,
-                HttpStatus.OK))
-            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(<%= instanceName %>));
     }
 
     /**

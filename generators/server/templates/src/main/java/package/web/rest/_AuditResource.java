@@ -2,6 +2,8 @@ package <%=packageName%>.web.rest;
 
 import <%=packageName%>.service.AuditEventService;
 import <%=packageName%>.web.rest.util.PaginationUtil;
+import <%=packageName%>.web.rest.util.ResponseUtil;
+
 import io.swagger.annotations.ApiParam;
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.data.domain.Page;
@@ -73,8 +75,6 @@ public class AuditResource {
      */
     @GetMapping("/{id:.+}")
     public ResponseEntity<AuditEvent> get(@PathVariable <% if (databaseType == 'sql') { %>Long <% } %><% if (databaseType == 'mongodb') { %>String <% } %>id) {
-        return auditEventService.find(id)
-                .map((entity) -> new ResponseEntity<>(entity, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return ResponseUtil.wrapOrNotFound(auditEventService.find(id));
     }
 }
