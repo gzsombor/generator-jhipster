@@ -69,7 +69,7 @@ public class DomainUserDetailsService implements UserDetailsService {
         });
     }
 
-    private org.springframework.security.core.userdetails.User createSpringSecurityUser(String lowercaseLogin, User user) {
+    private DomainUser createSpringSecurityUser(String lowercaseLogin, User user) {
         if (!user.getActivated()) {
             throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
         }
@@ -77,8 +77,8 @@ public class DomainUserDetailsService implements UserDetailsService {
             .map(authority -> new SimpleGrantedAuthority(authority.getName()))<% } %><% if (databaseType === 'cassandra' || databaseType === 'couchbase') { %>
             .map(authority -> new SimpleGrantedAuthority(authority))<% } %>
             .collect(Collectors.toList());
-        return new org.springframework.security.core.userdetails.User(user.getLogin(),
-            user.getPassword(),
-            grantedAuthorities);
+        return new DomainUser(user.getId(), lowercaseLogin,
+                user.getPassword(),
+                grantedAuthorities);
     }
 }

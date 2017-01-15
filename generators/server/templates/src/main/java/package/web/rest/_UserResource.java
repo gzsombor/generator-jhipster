@@ -218,34 +218,36 @@ public class UserResource {
     <%_ } _%>
 
     /**
-     * GET /users/:login : get the "login" user.
+     * GET  /users/:id : get the user by id.
      *
-     * @param login the login of the user to find
-     * @return the ResponseEntity with status 200 (OK) and with body the "login" user, or with status 404 (Not Found)
+     * @param id the id of the user to find
+     * @return the ResponseEntity with status 200 (OK) and with body the user, or with status 404 (Not Found)
      */
-    @GetMapping("/users/{login:" + Constants.LOGIN_REGEX + "}")
+    @GetMapping("/users/{id}")
     @Timed
-    public ResponseEntity<UserDTO> getUser(@PathVariable String login) {
-        log.debug("REST request to get User : {}", login);
+    public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
+        log.debug("REST request to get User : {}", id);
         return ResponseUtil.wrapOrNotFound(
-            userService.getUserWithAuthoritiesByLogin(login)
-                .map(UserDTO::new));
+            userService.getUserWithAuthorities(id));
     }
 <%_ if (authenticationType !== 'oauth2') { _%>
 
     /**
-     * DELETE /users/:login : delete the "login" User.
+     * DELETE /users/:id : delete the User by id.
      *
-     * @param login the login of the user to delete
+     * @param id the id of the user to delete
      * @return the ResponseEntity with status 200 (OK)
      */
-    @DeleteMapping("/users/{login:" + Constants.LOGIN_REGEX + "}")
+    @DeleteMapping("/users/{id}")
     @Timed
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<Void> deleteUser(@PathVariable String login) {
-        log.debug("REST request to delete User: {}", login);
-        userService.deleteUser(login);
-        return ResponseEntity.ok().headers(HeaderUtil.createAlert(<% if(enableTranslation) {%> "userManagement.deleted"<% } else { %> "A user is deleted with identifier " + login<% } %>, login)).build();
+    public ResponseEntity<UserDTO> deleteUser(@PathVariable Long id) {
+        log.debug("REST request to delete User: {}", id);
+        Optional<UserDTO> deletedUser = userService.deleteUser(id);
+        return ResponseUtil.wrapOrNotFound(deletedUser,
+                deletedUser.map(UserDTO::getLogin)
+                .map(login -> HeaderUtil.createAlert(<% if(enableTranslation) {%> "userManagement.deleted"<% } else { %> "A user is deleted with identifier " + login<% } %>, login))
+                .orElse(null));
     }
 <%_ } _%>
 <%_ if (searchEngine === 'elasticsearch') { _%>

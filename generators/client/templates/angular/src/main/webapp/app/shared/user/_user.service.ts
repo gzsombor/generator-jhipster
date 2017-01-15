@@ -39,8 +39,8 @@ export class UserService {
         return this.http.put<User>(this.resourceUrl, user, { observe: 'response' });
     }
 
-    find(login: string): Observable<HttpResponse<User>> {
-        return this.http.get<User>(`${this.resourceUrl}/${login}`, { observe: 'response' });
+    find(id: string): Observable<HttpResponse<User>> {
+        return this.http.get<User>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 <% } %>
     query(req?: any): Observable<HttpResponse<User[]>> {
@@ -49,8 +49,8 @@ export class UserService {
     }
 <%_ if (authenticationType !== 'oauth2') { _%>
 
-    delete(login: string): Observable<HttpResponse<any>> {
-        return this.http.delete(`${this.resourceUrl}/${login}`, { observe: 'response' });
+    delete(id: string): Observable<HttpResponse<any>> {
+        return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
     authorities(): Observable<string[]> {

@@ -143,7 +143,7 @@ public class UserService {
     }
 <%_ if (authenticationType !== 'oauth2') { _%>
 
-    public Optional<User> activateRegistration(String key) {
+    public Optional<UserDTO> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
         return userRepository.findOneByActivationKey(key)
             .map(user -> {
@@ -162,7 +162,8 @@ public class UserService {
                 <%_ } _%>
                 log.debug("Activated user: {}", user);
                 return user;
-            });
+            })
+            .map(UserDTO::new);
     }
 
     public Optional<User> completePasswordReset(String newPassword, String key) {
@@ -293,11 +294,12 @@ public class UserService {
      <%_ if (databaseType === 'mongodb' || databaseType === 'sql' || databaseType === 'couchbase') { _%>
      * @param imageUrl image URL of user
      <%_ } _%>
+     * @return the modified user if possible
      */
-    public void updateUser(String firstName, String lastName, String email, String langKey<% if (databaseType === 'mongodb' || databaseType === 'couchbase' || databaseType === 'sql') { %>, String imageUrl<% } %>) {
-        SecurityUtils.getCurrentUserLogin()
-            .flatMap(userRepository::findOneByLogin)
-            .ifPresent(user -> {
+    public Optional<UserDTO>  updateUser(String firstName, String lastName, String email, String langKey<% if (databaseType === 'mongodb' || databaseType === 'couchbase' || databaseType === 'sql') { %>, String imageUrl<% } %>) {
+        return SecurityUtils.getCurrentUserLoginId()
+            .flatMap(userRepository::findOne)
+            .map(user -> {
                 user.setFirstName(firstName);
                 user.setLastName(lastName);
                 user.setEmail(email);
@@ -316,7 +318,8 @@ public class UserService {
                 cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE).evict(user.getEmail());
                 <%_ } _%>
                 log.debug("Changed Information for User: {}", user);
-            });
+                return user;
+            }).map(UserDTO::new);
     }
 
     /**
@@ -368,8 +371,8 @@ public class UserService {
             .map(UserDTO::new);
     }
 
-    public void deleteUser(String login) {
-        userRepository.findOneByLogin(login).ifPresent(user -> {
+    public Optional<UserDTO> deleteUser(Long id) {
+        return Optional.ofNullable(id).map(userRepository::findOne).map(user -> {
             <%_ if (enableSocialSignIn) { _%>
             socialService.deleteUserSocialConnection(user.getLogin());
             <%_ } _%>
@@ -382,13 +385,14 @@ public class UserService {
             cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE).evict(user.getEmail());
             <%_ } _%>
             log.debug("Deleted User: {}", user);
-        });
+            return user;
+        }).map(UserDTO::new);
     }
 <%_ if (authenticationType !== 'oauth2') { _%>
 
     public void changePassword(String password) {
-        SecurityUtils.getCurrentUserLogin()
-            .flatMap(userRepository::findOneByLogin)
+        SecurityUtils.getCurrentUserLoginId()
+            .flatMap(userRepository::findOne)
             .ifPresent(user -> {
                 String encryptedPassword = passwordEncoder.encode(password);
                 user.setPassword(encryptedPassword);
@@ -421,30 +425,36 @@ public class UserService {
     <%_ if (databaseType === 'sql') { _%>
     @Transactional(readOnly = true)
     <%_ } _%>
-    public Optional<User> getUserWithAuthoritiesByLogin(String login) {
+    public Optional<UserDTO> getUserWithAuthoritiesByLogin(String login) {
         <%_ if (databaseType === 'sql') { _%>
-        return userRepository.findOneWithAuthoritiesByLogin(login);
+        return userRepository.findOneWithAuthoritiesByLogin(login).map(UserDTO::new);
         <%_ } else { // MongoDB, Couchbase and Cassandra _%>
-        return userRepository.findOneByLogin(login);
+        return userRepository.findOneByLogin(login).map(UserDTO::new);
         <%_ } _%>
     }
 
     <%_ if (databaseType === 'sql') { _%>
     @Transactional(readOnly = true)
     <%_ } _%>
-    public Optional<User> getUserWithAuthorities(<%= pkType %> id) {
+    public Optional<UserDTO> getUserWithAuthorities(<%= pkType %> id) {
         <%_ if (databaseType === 'sql') { _%>
-        return userRepository.findOneWithAuthoritiesById(id);
+        return userRepository.findOneWithAuthoritiesById(id).map(UserDTO::new);
         <%_ } else { // MongoDB, Couchbase and and Cassandra _%>
-        return Optional.ofNullable(userRepository.findOne(id));
+        return Optional.ofNullable(userRepository.findOne(id)).map(UserDTO::new);
         <%_ } _%>
     }
 
     <%_ if (databaseType === 'sql') { _%>
     @Transactional(readOnly = true)
     <%_ } _%>
-    public Optional<User> getUserWithAuthorities() {
-        return SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOne<% if (databaseType === 'sql') { %>WithAuthorities<% } %>ByLogin);
+    public Optional<UserDTO> getUserWithAuthorities() {
+        <%_ if (databaseType === 'sql') { _%>
+        return SecurityUtils.getCurrentUserLoginId()
+                .map(userRepository::findOneWithAuthoritiesById)
+        <%_ } else { // MongoDB, Couchbase and and Cassandra _%>
+        return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin())
+        <%_ } _%>
+                .map(UserDTO::new);
     }
     <%_ if ((databaseType === 'sql' || databaseType === 'mongodb' || databaseType === 'couchbase') && authenticationType === 'session') { _%>
 

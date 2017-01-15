@@ -66,6 +66,23 @@ public final class SecurityUtils {
     <%_ } _%>
 
     /**
+     * Get the id of the current user.
+     *
+     * @return the id of the current user
+     */
+    public static Optional<<%= pkType %>> getCurrentUserLoginId() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication authentication = securityContext.getAuthentication();
+        if (authentication != null) {
+            if (authentication.getPrincipal() instanceof DomainUser) {
+                DomainUser springSecurityUser = (DomainUser) authentication.getPrincipal();
+                return springSecurityUser.getId();
+            }
+        }
+        return null;
+    }
+
+    /**
      * Check if a user is authenticated.
      *
      * @return true if the user is authenticated, false otherwise

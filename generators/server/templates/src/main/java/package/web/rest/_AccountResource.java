@@ -218,11 +218,12 @@ public class AccountResource {
      */
     @GetMapping("/activate")
     @Timed
-    public void activateAccount(@RequestParam(value = "key") String key) {
-        Optional<User> user = userService.activateRegistration(key);
+    public UserDTO activateAccount(@RequestParam(value = "key") String key) {
+        Optional<UserDTO> user = userService.activateRegistration(key);
         if (!user.isPresent()) {
             throw new InternalServerErrorException("No user was found for this reset key");
         }
+        return user.get();
     }
 
     /**
@@ -248,7 +249,6 @@ public class AccountResource {
     @Timed
     public UserDTO getAccount() {
         return userService.getUserWithAuthorities()
-            .map(UserDTO::new)
             .orElseThrow(() -> new InternalServerErrorException("User could not be found"));
     }
 
@@ -261,19 +261,19 @@ public class AccountResource {
      */
     @PostMapping("/account")
     @Timed
-    public void saveAccount(@Valid @RequestBody UserDTO userDTO) {
-        final String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new InternalServerErrorException("Current user login not found"));
-        Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
-        if (existingUser.isPresent() && (!existingUser.get().getLogin().equalsIgnoreCase(userLogin))) {
-            throw new EmailAlreadyUsedException();
-        }
-        Optional<User> user = userRepository.findOneByLogin(userLogin);
-        if (!user.isPresent()) {
+    public UserDTO saveAccount(@Valid @RequestBody UserDTO userDTO) {
+        Optional<<%= pkType %>> userId = SecurityUtils.getCurrentUserLoginId();
+        if (!userId.isPresent()) {
             throw new InternalServerErrorException("User could not be found");
         }
-        userService.updateUser(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail(),
-            userDTO.getLangKey()<% if (databaseType === 'mongodb' || databaseType === 'couchbase' || databaseType === 'sql') { %>, userDTO.getImageUrl()<% } %>);
-   }
+        Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
+        if (existingUser.isPresent() && (!existingUser.get().getId().equals(userId.get()))) {
+            throw new EmailAlreadyUsedException();
+        }
+        return userService.updateUser(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail(),
+                userDTO.getLangKey()<% if (databaseType === 'mongodb' || databaseType === 'couchbase' || databaseType === 'sql') { %>, userDTO.getImageUrl()<% } %>)
+            .orElseThrow(() -> new InternalServerErrorException("User could not be found"));
+    }
 
     /**
      * POST  /account/change-password : changes the current user's password

@@ -43,8 +43,8 @@ export class UserMgmtDeleteDialogComponent {
         this.activeModal.dismiss('cancel');
     }
 
-    confirmDelete(login) {
-        this.userService.delete(login).subscribe((response) => {
+    confirmDelete(id) {
+        this.userService.delete(id).subscribe((response) => {
             this.eventManager.broadcast({ name: 'userListModification',
                 content: 'Deleted a user'});
             this.activeModal.dismiss(true);
@@ -67,7 +67,7 @@ export class UserDeleteDialogComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.routeSub = this.route.params.subscribe((params) => {
-            this.userModalService.open(UserMgmtDeleteDialogComponent as Component, params['login']);
+            this.userModalService.open(UserMgmtDeleteDialogComponent as Component, params['id']);
         });
     }
 

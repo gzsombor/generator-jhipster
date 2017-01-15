@@ -330,7 +330,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
         <%_ } _%>
         user.setLangKey("en");
         user.setAuthorities(authorities);
-        when(mockUserService.getUserWithAuthorities()).thenReturn(Optional.of(user));
+        when(mockUserService.getUserWithAuthorities()).thenReturn(Optional.of(new UserDTO(user)));
 
         restUserMockMvc.perform(get("/api/account")
             .accept(MediaType.APPLICATION_JSON))
