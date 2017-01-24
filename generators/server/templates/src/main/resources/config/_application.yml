@@ -163,6 +163,11 @@ spring:
             client-id: xxx
             client-secret: xxx
 
+        # see https://github.com/settings/applications/new
+        github:
+            client-id: xxx
+            client-secret: xxx
+
         # jhipster-needle-add-social-configuration
 <%_ } _%>
 <%_ if (authenticationType === 'oauth2') { _%>

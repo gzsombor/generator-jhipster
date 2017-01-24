@@ -40,12 +40,15 @@ import org.springframework.social.config.annotation.SocialConfigurer;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.connect.UsersConnectionRepository;
+import org.springframework.social.connect.support.OAuth2ConnectionFactory;
 import org.springframework.social.connect.web.ConnectController;
 import org.springframework.social.connect.web.ProviderSignInController;
 import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.social.connect.web.SignInAdapter;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.google.connect.GoogleConnectionFactory;
+import org.springframework.social.oauth2.GenericOAuth2ServiceProvider;
+import org.springframework.social.oauth2.TokenStrategy;
 import org.springframework.social.security.AuthenticationNameUserIdSource;
 import org.springframework.social.twitter.connect.TwitterConnectionFactory;
 // jhipster-needle-add-social-connection-factory-import-package
@@ -85,9 +88,24 @@ public class SocialConfiguration implements SocialConfigurer {
 
     @Override
     public void addConnectionFactories(ConnectionFactoryConfigurer connectionFactoryConfigurer, Environment environment) {
-        // Google configuration
-        String googleClientId = environment.getProperty("spring.social.google.client-id");
-        String googleClientSecret = environment.getProperty("spring.social.google.client-secret");
+        configureGoogleConnection(connectionFactoryConfigurer, environment);
+
+        configureFacebookConnection(connectionFactoryConfigurer, environment);
+
+        configureTwitterConnection(connectionFactoryConfigurer, environment);
+
+        configureGithubConnection(connectionFactoryConfigurer, environment);
+
+        // jhipster-needle-add-social-connection-factory
+    }
+
+	/**
+	 * Google configuration
+	 */
+	private void configureGoogleConnection(ConnectionFactoryConfigurer connectionFactoryConfigurer,
+			Environment environment) {
+        final String googleClientId = environment.getProperty("spring.social.google.client-id");
+        final String googleClientSecret = environment.getProperty("spring.social.google.client-secret");
         if (googleClientId != null && googleClientSecret != null) {
             log.debug("Configuring GoogleConnectionFactory");
             connectionFactoryConfigurer.addConnectionFactory(
@@ -99,10 +117,15 @@ public class SocialConfiguration implements SocialConfigurer {
         } else {
             log.error("Cannot configure GoogleConnectionFactory id or secret null");
         }
+	}
 
-        // Facebook configuration
-        String facebookClientId = environment.getProperty("spring.social.facebook.client-id");
-        String facebookClientSecret = environment.getProperty("spring.social.facebook.client-secret");
+	/**
+	 * Facebook configuration
+	 */
+	private void configureFacebookConnection(ConnectionFactoryConfigurer connectionFactoryConfigurer,
+			Environment environment) {
+        final String facebookClientId = environment.getProperty("spring.social.facebook.client-id");
+        final String facebookClientSecret = environment.getProperty("spring.social.facebook.client-secret");
         if (facebookClientId != null && facebookClientSecret != null) {
             log.debug("Configuring FacebookConnectionFactory");
             connectionFactoryConfigurer.addConnectionFactory(
@@ -114,10 +137,15 @@ public class SocialConfiguration implements SocialConfigurer {
         } else {
             log.error("Cannot configure FacebookConnectionFactory id or secret null");
         }
+	}
 
-        // Twitter configuration
-        String twitterClientId = environment.getProperty("spring.social.twitter.client-id");
-        String twitterClientSecret = environment.getProperty("spring.social.twitter.client-secret");
+	/**
+	 * Twitter configuration
+	 */
+	private void configureTwitterConnection(ConnectionFactoryConfigurer connectionFactoryConfigurer,
+			Environment environment) {
+        final String twitterClientId = environment.getProperty("spring.social.twitter.client-id");
+        final String twitterClientSecret = environment.getProperty("spring.social.twitter.client-secret");
         if (twitterClientId != null && twitterClientSecret != null) {
             log.debug("Configuring TwitterConnectionFactory");
             connectionFactoryConfigurer.addConnectionFactory(
@@ -129,8 +157,33 @@ public class SocialConfiguration implements SocialConfigurer {
         } else {
             log.error("Cannot configure TwitterConnectionFactory id or secret null");
         }
+	}
 
-        // jhipster-needle-add-social-connection-factory
+	private void configureGithubConnection(ConnectionFactoryConfigurer connectionFactoryConfigurer,
+			Environment environment) {
+		final String githubClientId = environment.getProperty("spring.social.github.client-id");
+		final String githubClientSecret = environment.getProperty("spring.social.github.client-secret");
+        if (githubClientId != null && githubClientSecret != null) {
+            log.debug("Configuring GithubConnectionFactory");
+            connectionFactoryConfigurer.addConnectionFactory(
+                githubConnection(
+                    githubClientId,
+                    githubClientSecret
+                )
+            );
+        } else {
+            log.error("Cannot configure github connection: id or secret null");
+        }
+	}
+
+    private OAuth2ConnectionFactory<Void> githubConnection(String clientId, String clientSecret) {
+        return new OAuth2ConnectionFactory("github", createGithubServiceProvider(clientId, clientSecret), null);
+    }
+
+    private GenericOAuth2ServiceProvider createGithubServiceProvider(String clientId, String clientSecret) {
+		return  new GenericOAuth2ServiceProvider(clientId, clientSecret,
+				"https://github.com/login/oauth/authorize", null,
+				"https://github.com/login/oauth/access_token", true, TokenStrategy.AUTHORIZATION_HEADER);
     }
 
     @Override
