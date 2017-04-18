@@ -20,6 +20,7 @@ package <%=packageName%>.service.mapper;
 
 import <%=packageName%>.domain.*;
 import <%=packageName%>.service.dto.<%= entityClass %>DTO;
+import <%=packageName%>.service.dto.<%= entityClass %>UpdateDTO;
 
 import org.mapstruct.*;
 
@@ -80,6 +81,16 @@ _%>
     <%_ } _%>
     <%_ if(databaseType === 'sql') { _%>
 
+    void updateEntity(<%= entityClass %>UpdateDTO dto, @MappingTarget <%= entityClass %> entity);
+
+    /**
+     * generating the fromId for all mappers if the databaseType is sql, as the class has relationship to it might need it, instead of
+     * creating a new attribute to know if the entity has any relationship from some other entity
+     *
+     * @param id id of the entity
+     * @return the entity instance
+     */
+     <%if(databaseType === 'sql') { %>
     default <%= entityClass %> fromId(Long id) {
         if (id == null) {
             return null;

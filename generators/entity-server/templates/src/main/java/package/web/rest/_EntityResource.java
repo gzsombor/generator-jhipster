@@ -31,6 +31,7 @@ import <%=packageName%>.web.rest.util.HeaderUtil;<% if (pagination !== 'no') { %
 import <%=packageName%>.web.rest.util.PaginationUtil;<% } %>
 <%_ if (dto === 'mapstruct') { _%>
 import <%=packageName%>.service.dto.<%= entityClass %>DTO;
+import <%=packageName%>.service.dto.<%= entityClass %>UpdateDTO;
 <%_ if (service === 'no') { _%>
 import <%=packageName%>.service.mapper.<%= entityClass %>Mapper;
 <%_ } } _%>
@@ -76,6 +77,7 @@ public class <%= entityClass %>Resource {
     private static final String ENTITY_NAME = "<%= entityInstance %>";
     <%_
     const instanceType = (dto === 'mapstruct') ? entityClass + 'DTO' : entityClass;
+    const updateType = (dto === 'mapstruct') ? entityClass + 'UpdateDTO' : entityClass;
     const instanceName = (dto === 'mapstruct') ? entityInstance + 'DTO' : entityInstance;
     _%><%- include('../../common/inject_template', {viaService: viaService, constructorName: entityClass + 'Resource', queryService: jpaMetamodelFiltering}); -%>
 
@@ -88,7 +90,7 @@ public class <%= entityClass %>Resource {
      */
     @PostMapping("/<%= entityApiUrl %>")
     @Timed
-    public ResponseEntity<<%= instanceType %>> create<%= entityClass %>(<% if (validation) { %>@Valid <% } %>@RequestBody <%= instanceType %> <%= instanceName %>) throws URISyntaxException {
+    public ResponseEntity<<%= instanceType %>> create<%= entityClass %>(<% if (validation) { %>@Valid <% } %>@RequestBody <%= updateType %> <%= instanceName %>) throws URISyntaxException {
         log.debug("REST request to save <%= entityClass %> : {}", <%= instanceName %>);
         if (<%= instanceName %>.getId() != null) {
             throw new BadRequestAlertException("A new <%= entityInstance %> cannot already have an ID", ENTITY_NAME, "idexists");
@@ -109,7 +111,7 @@ public class <%= entityClass %>Resource {
      */
     @PutMapping("/<%= entityApiUrl %>")
     @Timed
-    public ResponseEntity<<%= instanceType %>> update<%= entityClass %>(<% if (validation) { %>@Valid <% } %>@RequestBody <%= instanceType %> <%= instanceName %>) throws URISyntaxException {
+    public ResponseEntity<<%= instanceType %>> update<%= entityClass %>(<% if (validation) { %>@Valid <% } %>@RequestBody <%= updateType %> <%= instanceName %>) throws URISyntaxException {
         log.debug("REST request to update <%= entityClass %> : {}", <%= instanceName %>);
         if (<%= instanceName %>.getId() == null) {
             return create<%= entityClass %>(<%= instanceName %>);

@@ -20,6 +20,7 @@ package <%=packageName%>.service<% if (service === 'serviceImpl') { %>.impl<% } 
 <%  const serviceClassName = service === 'serviceImpl' ? entityClass + 'ServiceImpl' : entityClass + 'Service';
     let viaService = false;
     const instanceType = (dto === 'mapstruct') ? entityClass + 'DTO' : entityClass;
+    const updateType = (dto === 'mapstruct') ? entityClass + 'UpdateDTO' : entityClass;
     const instanceName = (dto === 'mapstruct') ? entityInstance + 'DTO' : entityInstance;
     const mapper = entityInstance  + 'Mapper';
     const dtoToEntity = mapper + '.'+ 'toEntity';
@@ -33,6 +34,7 @@ import <%=packageName%>.domain.<%= entityClass %>;
 import <%=packageName%>.repository.<%= entityClass %>Repository;<% if (searchEngine === 'elasticsearch') { %>
 import <%=packageName%>.repository.search.<%= entityClass %>SearchRepository;<% } if (dto === 'mapstruct') { %>
 import <%=packageName%>.service.dto.<%= entityClass %>DTO;
+import <%=packageName%>.service.dto.<%= entityClass %>UpdateDTO;
 import <%=packageName%>.service.mapper.<%= entityClass %>Mapper;<% } %>
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +74,7 @@ public class <%= serviceClassName %><% if (service === 'serviceImpl') { %> imple
     <%_ if (service === 'serviceImpl') { _%>
     @Override
     <%_ } _%>
-    public <%= instanceType %> save(<%= instanceType %> <%= instanceName %>) {
+    public <%= instanceType %> save(<%= updateType %> <%= instanceName %>) {
         log.debug("Request to save <%= entityClass %> : {}", <%= instanceName %>);<%- include('../../common/save_template', {viaService: viaService, returnDirectly: true}); -%>
     }
 

@@ -18,9 +18,11 @@
 -%>
 package <%=packageName%>.service;
 <%  const instanceType = (dto === 'mapstruct') ? entityClass + 'DTO' : entityClass;
-    const instanceName = (dto === 'mapstruct') ? entityInstance + 'DTO' : entityInstance; %>
+    const updateType = (dto === 'mapstruct') ? entityClass + 'UpdateDTO' : entityClass;
+    const instanceName = (dto === 'mapstruct') ? entityInstance + 'DTO' : entityInstance;%>
 <%_ if (dto === 'mapstruct') { _%>
 import <%=packageName%>.service.dto.<%= entityClass %>DTO;
+import <%=packageName%>.service.dto.<%= entityClass %>UpdateDTO;
 <%_ } else { _%>
 import <%=packageName%>.domain.<%= entityClass %>;
 <%_ } _%>
@@ -43,7 +45,7 @@ public interface <%= entityClass %>Service {
      * @param <%= instanceName %> the entity to save
      * @return the persisted entity
      */
-    <%= instanceType %> save(<%= instanceType %> <%= instanceName %>);
+    <%= instanceType %> save(<%= updateType %> <%= instanceName %>);
 
     /**
      * Get all the <%= entityInstancePlural %>.
