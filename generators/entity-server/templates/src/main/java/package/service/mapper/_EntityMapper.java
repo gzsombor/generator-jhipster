@@ -56,6 +56,9 @@ _%>
     <%= entityClass %>DTO toDto(<%= entityClass %> <%= entityInstance %>);
     <%_ } _%>
 
+    // Mainly for testing
+    <%= entityClass %>UpdateDTO toUpdateDTO(<%= entityClass %> <%= entityInstance %>);
+
 <%_
 // DTO -> entity mapping
 var renMapAnotDto = false;  //Render Mapping Annotation during DTO to Entity conversion?
@@ -77,7 +80,7 @@ _%>
             <%_ } _%>
         <%_ } _%>
     <%_ if(renMapAnotDto === true) { _%>
-    <%= entityClass %> toEntity(<%= entityClass%>DTO <%= entityInstance %>DTO);
+    <%= entityClass %> toEntityFromUpdate(<%= entityClass%>UpdateDTO <%= entityInstance %>UpdateDTO);
     <%_ } _%>
     <%_ if(databaseType === 'sql') { _%>
 
