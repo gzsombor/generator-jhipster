@@ -307,11 +307,11 @@ _%>
      */
     public static <%= entityClass %> createEntity(<% if (databaseType === 'sql') { %>EntityManager em<% } %>) {
         <%_ if (fluentMethods) { _%>
-        <%= entityClass %> <%= entityInstance %> = new <%= entityClass %>()<% for (idx in fields) { %>
+        final <%= entityClass %> <%= entityInstance %> = new <%= entityClass %>()<% for (idx in fields) { %>
             .<%= fields[idx].fieldName %>(<%='DEFAULT_' + fields[idx].fieldNameUnderscored.toUpperCase()%>)<% if ((fields[idx].fieldType === 'byte[]' || fields[idx].fieldType === 'ByteBuffer') && fields[idx].fieldTypeBlobContent !== 'text') { %>
             .<%= fields[idx].fieldName %>ContentType(<%='DEFAULT_' + fields[idx].fieldNameUnderscored.toUpperCase()%>_CONTENT_TYPE)<% } %><% } %>;
         <%_ } else { _%>
-        <%= entityClass %> <%= entityInstance %> = new <%= entityClass %>();
+        final <%= entityClass %> <%= entityInstance %> = new <%= entityClass %>();
             <%_ for (idx in fields) { _%>
         <%= entityInstance %>.set<%= fields[idx].fieldInJavaBeanMethod %>(<%='DEFAULT_' + fields[idx].fieldNameUnderscored.toUpperCase() %>);
                 <%_ if ((fields[idx].fieldType === 'byte[]' || fields[idx].fieldType === 'ByteBuffer') && fields[idx].fieldTypeBlobContent !== 'text') { _%>
@@ -356,11 +356,11 @@ _%>
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void create<%= entityClass %>() throws Exception {
-        int databaseSizeBeforeCreate = <%= entityInstance %>Repository.findAll().size();
+        final int databaseSizeBeforeCreate = <%= entityInstance %>Repository.findAll().size();
 
         // Create the <%= entityClass %>
         <%_ if (dto === 'mapstruct') { _%>
-        <%= entityClass %>DTO <%= entityInstance %>DTO = <%= entityInstance %>Mapper.toDto(<%= entityInstance %>);
+        final <%= entityClass %>DTO <%= entityInstance %>DTO = <%= entityInstance %>Mapper.toDto(<%= entityInstance %>);
         <%_ } _%>
         rest<%= entityClass %>MockMvc.perform(post("/api/<%= entityApiUrl %>")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -368,9 +368,9 @@ _%>
             .andExpect(status().isCreated());
 
         // Validate the <%= entityClass %> in the database
-        List<<%= entityClass %>> <%= entityInstance %>List = <%= entityInstance %>Repository.findAll();
+        final List<<%= entityClass %>> <%= entityInstance %>List = <%= entityInstance %>Repository.findAll();
         assertThat(<%= entityInstance %>List).hasSize(databaseSizeBeforeCreate + 1);
-        <%= entityClass %> test<%= entityClass %> = <%= entityInstance %>List.get(<%= entityInstance %>List.size() - 1);
+        final <%= entityClass %> test<%= entityClass %> = <%= entityInstance %>List.get(<%= entityInstance %>List.size() - 1);
         <%_ for (idx in fields) { if (fields[idx].fieldType === 'ZonedDateTime') { _%>
         assertThat(test<%= entityClass %>.get<%=fields[idx].fieldInJavaBeanMethod%>()).isEqualTo(<%='DEFAULT_' + fields[idx].fieldNameUnderscored.toUpperCase()%>);
         <%_ } else if ((fields[idx].fieldType === 'byte[]' || fields[idx].fieldType === 'ByteBuffer') && fields[idx].fieldTypeBlobContent !== 'text') { _%>
@@ -383,7 +383,7 @@ _%>
         <%_ }} if (searchEngine === 'elasticsearch') { _%>
 
         // Validate the <%= entityClass %> in Elasticsearch
-        <%= entityClass %> <%= entityInstance %>Es = <%= entityInstance %>SearchRepository.findOne(test<%= entityClass %>.getId());
+        final <%= entityClass %> <%= entityInstance %>Es = <%= entityInstance %>SearchRepository.findOne(test<%= entityClass %>.getId());
         <%_ for (idx in fields) { if (fields[idx].fieldType === 'ZonedDateTime') { _%>
         assertThat(test<%= entityClass %>.get<%=fields[idx].fieldInJavaBeanMethod%>()).isEqualTo(test<%= entityClass %>.get<%=fields[idx].fieldInJavaBeanMethod%>());
         <%_ }} _%>
@@ -394,12 +394,12 @@ _%>
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void create<%= entityClass %>WithExistingId() throws Exception {
-        int databaseSizeBeforeCreate = <%= entityInstance %>Repository.findAll().size();
+        final int databaseSizeBeforeCreate = <%= entityInstance %>Repository.findAll().size();
 
         // Create the <%= entityClass %> with an existing ID
         <%= entityInstance %>.setId(<% if (databaseType === 'sql') { %>1L<% } else if (databaseType === 'mongodb' || databaseType === 'couchbase') { %>"existing_id"<% } else if (databaseType === 'cassandra') { %>UUID.randomUUID()<% } %>);
         <%_ if (dto === 'mapstruct') { _%>
-        <%= entityClass %>DTO <%= entityInstance %>DTO = <%= entityInstance %>Mapper.toDto(<%= entityInstance %>);
+        final <%= entityClass %>DTO <%= entityInstance %>DTO = <%= entityInstance %>Mapper.toDto(<%= entityInstance %>);
         <%_ } _%>
 
         // An entity with an existing ID cannot be created, so this API call must fail
@@ -409,7 +409,7 @@ _%>
             .andExpect(status().isBadRequest());
 
         // Validate the <%= entityClass %> in the database
-        List<<%= entityClass %>> <%= entityInstance %>List = <%= entityInstance %>Repository.findAll();
+        final List<<%= entityClass %>> <%= entityInstance %>List = <%= entityInstance %>Repository.findAll();
         assertThat(<%= entityInstance %>List).hasSize(databaseSizeBeforeCreate);
     }
 <% for (idx in fields) { %><% if (fields[idx].fieldValidate === true) {
@@ -421,19 +421,19 @@ _%>
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void check<%= fields[idx].fieldInJavaBeanMethod %>IsRequired() throws Exception {
-        int databaseSizeBeforeTest = <%= entityInstance %>Repository.findAll().size();
+        final int databaseSizeBeforeTest = <%= entityInstance %>Repository.findAll().size();
         // set the field null
         <%= entityInstance %>.set<%= fields[idx].fieldInJavaBeanMethod %>(null);
 
         // Create the <%= entityClass %>, which fails.<% if (dto === 'mapstruct') { %>
-        <%= entityClass %>DTO <%= entityInstance %>DTO = <%= entityInstance %>Mapper.toDto(<%= entityInstance %>);<% } %>
+        final <%= entityClass %>DTO <%= entityInstance %>DTO = <%= entityInstance %>Mapper.toDto(<%= entityInstance %>);<% } %>
 
         rest<%= entityClass %>MockMvc.perform(post("/api/<%= entityApiUrl %>")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(<%= entityInstance %><% if (dto === 'mapstruct') { %>DTO<% } %>)))
             .andExpect(status().isBadRequest());
 
-        List<<%= entityClass %>> <%= entityInstance %>List = <%= entityInstance %>Repository.findAll();
+        final List<<%= entityClass %>> <%= entityInstance %>List = <%= entityInstance %>Repository.findAll();
         assertThat(<%= entityInstance %>List).hasSize(databaseSizeBeforeTest);
     }
 <%  } } } %>
@@ -632,10 +632,10 @@ _%>
         <%= entityInstance %>SearchRepository.save(<%= entityInstance %>);<%_ } _%>
 <%_ } _%>
 
-        int databaseSizeBeforeUpdate = <%= entityInstance %>Repository.findAll().size();
+        final int databaseSizeBeforeUpdate = <%= entityInstance %>Repository.findAll().size();
 
         // Update the <%= entityInstance %>
-        <%= entityClass %> updated<%= entityClass %> = <%= entityInstance %>Repository.findOne(<%= entityInstance %>.getId());<% if (databaseType === 'sql') { %>
+        final <%= entityClass %> updated<%= entityClass %> = <%= entityInstance %>Repository.findOne(<%= entityInstance %>.getId());<% if (databaseType === 'sql') { %>
         // Disconnect from session so that the updates on updated<%= entityClass %> are not directly saved in db
         em.detach(updated<%= entityClass %>);<% } %>
         <%_ if (fluentMethods && fields.length > 0) { _%>
@@ -651,7 +651,7 @@ _%>
             <%_ } _%>
         <%_ } _%>
         <%_ if (dto === 'mapstruct') { _%>
-        <%= entityClass %>DTO <%= entityInstance %>DTO = <%= entityInstance %>Mapper.toDto(updated<%= entityClass %>);
+        final <%= entityClass %>DTO <%= entityInstance %>DTO = <%= entityInstance %>Mapper.toDto(updated<%= entityClass %>);
         <%_ } _%>
 
         rest<%= entityClass %>MockMvc.perform(put("/api/<%= entityApiUrl %>")
@@ -660,9 +660,9 @@ _%>
             .andExpect(status().isOk());
 
         // Validate the <%= entityClass %> in the database
-        List<<%= entityClass %>> <%= entityInstance %>List = <%= entityInstance %>Repository.findAll();
+        final List<<%= entityClass %>> <%= entityInstance %>List = <%= entityInstance %>Repository.findAll();
         assertThat(<%= entityInstance %>List).hasSize(databaseSizeBeforeUpdate);
-        <%= entityClass %> test<%= entityClass %> = <%= entityInstance %>List.get(<%= entityInstance %>List.size() - 1);
+        final <%= entityClass %> test<%= entityClass %> = <%= entityInstance %>List.get(<%= entityInstance %>List.size() - 1);
         <%_ for (idx in fields) { if (fields[idx].fieldType === 'ZonedDateTime') { _%>
         assertThat(test<%= entityClass %>.get<%=fields[idx].fieldInJavaBeanMethod%>()).isEqualTo(<%='UPDATED_' + fields[idx].fieldNameUnderscored.toUpperCase()%>);
         <%_ } else if ((fields[idx].fieldType === 'byte[]' || fields[idx].fieldType === 'ByteBuffer') && fields[idx].fieldTypeBlobContent !== 'text') { _%>
@@ -675,7 +675,7 @@ _%>
         <%_ } } if (searchEngine === 'elasticsearch') { _%>
 
         // Validate the <%= entityClass %> in Elasticsearch
-        <%= entityClass %> <%= entityInstance %>Es = <%= entityInstance %>SearchRepository.findOne(test<%= entityClass %>.getId());
+        final <%= entityClass %> <%= entityInstance %>Es = <%= entityInstance %>SearchRepository.findOne(test<%= entityClass %>.getId());
         <%_ for (idx in fields) { if (fields[idx].fieldType === 'ZonedDateTime') { _%>
         assertThat(test<%= entityClass %>.get<%=fields[idx].fieldInJavaBeanMethod%>()).isEqualTo(test<%= entityClass %>.get<%=fields[idx].fieldInJavaBeanMethod%>());
         <%_ }} _%>
@@ -686,10 +686,10 @@ _%>
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void updateNonExisting<%= entityClass %>() throws Exception {
-        int databaseSizeBeforeUpdate = <%= entityInstance %>Repository.findAll().size();
+        final int databaseSizeBeforeUpdate = <%= entityInstance %>Repository.findAll().size();
 
         // Create the <%= entityClass %><% if (dto === 'mapstruct') { %>
-        <%= entityClass %>DTO <%= entityInstance %>DTO = <%= entityInstance %>Mapper.toDto(<%= entityInstance %>);<% } %>
+        final <%= entityClass %>DTO <%= entityInstance %>DTO = <%= entityInstance %>Mapper.toDto(<%= entityInstance %>);<% } %>
 
         // If the entity doesn't have an ID, it will be created instead of just being updated
         rest<%= entityClass %>MockMvc.perform(put("/api/<%= entityApiUrl %>")
@@ -698,7 +698,7 @@ _%>
             .andExpect(status().isCreated());
 
         // Validate the <%= entityClass %> in the database
-        List<<%= entityClass %>> <%= entityInstance %>List = <%= entityInstance %>Repository.findAll();
+        final List<<%= entityClass %>> <%= entityInstance %>List = <%= entityInstance %>Repository.findAll();
         assertThat(<%= entityInstance %>List).hasSize(databaseSizeBeforeUpdate + 1);
     }
 
@@ -713,7 +713,7 @@ _%>
         <%= entityInstance %>SearchRepository.save(<%= entityInstance %>);<%_ } _%>
 <%_ } _%>
 
-        int databaseSizeBeforeDelete = <%= entityInstance %>Repository.findAll().size();
+        final int databaseSizeBeforeDelete = <%= entityInstance %>Repository.findAll().size();
 
         // Get the <%= entityInstance %>
         rest<%= entityClass %>MockMvc.perform(delete("/api/<%= entityApiUrl %>/{id}", <%= entityInstance %>.getId())
@@ -721,11 +721,11 @@ _%>
             .andExpect(status().isOk());<% if (searchEngine === 'elasticsearch') { %>
 
         // Validate Elasticsearch is empty
-        boolean <%= entityInstance %>ExistsInEs = <%= entityInstance %>SearchRepository.exists(<%= entityInstance %>.getId());
+        final boolean <%= entityInstance %>ExistsInEs = <%= entityInstance %>SearchRepository.exists(<%= entityInstance %>.getId());
         assertThat(<%= entityInstance %>ExistsInEs).isFalse();<% } %>
 
         // Validate the database is empty
-        List<<%= entityClass %>> <%= entityInstance %>List = <%= entityInstance %>Repository.findAll();
+        final List<<%= entityClass %>> <%= entityInstance %>List = <%= entityInstance %>Repository.findAll();
         assertThat(<%= entityInstance %>List).hasSize(databaseSizeBeforeDelete - 1);
     }<% if (searchEngine === 'elasticsearch') { %>
 

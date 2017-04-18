@@ -409,7 +409,7 @@ public class <%= entityClass %> implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        <%= entityClass %> <%= entityInstance %> = (<%= entityClass %>) o;
+        final <%= entityClass %> <%= entityInstance %> = (<%= entityClass %>) o;
         if (<%= entityInstance %>.getId() == null || getId() == null) {
             return false;
         }

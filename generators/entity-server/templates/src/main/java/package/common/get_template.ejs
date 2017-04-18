@@ -20,7 +20,7 @@
     const instanceName = (dto === 'mapstruct') ? entityInstance + 'DTO' : entityInstance;
     const mapper = entityInstance  + 'Mapper';
     const entityToDto = mapper + '.' + 'toDto';
-    const returnPrefix = returnDirectly ? 'return' : instanceType + ' ' + instanceName + ' =';
+    const returnPrefix = returnDirectly ? 'return' : 'final ' + instanceType + ' ' + instanceName + ' =';
     if (!viaService) {
 %>
         <% if (dto === 'mapstruct') { %><%= entityClass %> <%= entityInstance %> = <% } else { %><%= returnPrefix %> <% } %><% if (databaseType === 'sql' || databaseType === 'mongodb' || databaseType === 'couchbase') { %><%= entityInstance %>Repository.<% if (fieldsContainOwnerManyToMany === true) { %>findOneWithEagerRelationships<% } else { %>findOne<% } %>(id)<% } %><% if (databaseType === 'cassandra') { %><%= entityInstance %>Repository.findOne(UUID.fromString(id))<% } %>;<% if (dto === 'mapstruct') { %>
