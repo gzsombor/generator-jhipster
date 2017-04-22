@@ -88,7 +88,7 @@ public class UserMapper {
         if (id == null) {
             return null;
         }
-        User user = new User();
+        final User user = new User();
         user.setId(id);
         return user;
     }
@@ -96,7 +96,7 @@ public class UserMapper {
 
     public Set<Authority> authoritiesFromStrings(Set<String> strings) {
         return strings.stream().map(string -> {
-            Authority auth = new Authority();
+            final Authority auth = new Authority();
             auth.setName(string);
             return auth;
         }).collect(Collectors.toSet());
