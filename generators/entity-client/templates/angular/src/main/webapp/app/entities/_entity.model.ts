@@ -104,12 +104,15 @@ import { BaseEntity<% if (hasUserRelationship) { %>, User<% } %> } from './../..
 fields.forEach(field => {
     if (field.fieldIsEnum && !enumsAlreadyDeclared.includes(field.fieldType)) {
         enumsAlreadyDeclared.push(field.fieldType); _%>
-export const enum <%= field.fieldType %> {<%
+const <%= field.fieldType %> = {<%
         const enums = field.fieldValues.split(',');
         for (let i = 0; i < enums.length; i++) { %>
-    '<%= enums[i] %>'<%if (i < enums.length - 1) { %>,<% }
-        } %>
+    <%= enums[i] %> : '<%= enums[i] %>' as '<%= enums[i] %>'<%if (i < enums.length - 1) { %>,<% } } %>
 }
+
+type <%= field.fieldType %> = (typeof <%= field.fieldType %>)[keyof typeof <%= field.fieldType %>];
+
+export { <%= field.fieldType %> }
 
 <%_ }
 }); _%>
