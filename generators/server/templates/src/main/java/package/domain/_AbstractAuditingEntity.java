@@ -53,7 +53,7 @@ public abstract class AbstractAuditingEntity implements Serializable {
     @Column(name = "created_by", nullable = false, length = 50, updatable = false)<% } %><% if (databaseType === 'mongodb' || databaseType === 'couchbase') { %>
     @Field("created_by")<% } %>
     @JsonIgnore
-    private String createdBy;
+    private Long createdBy;
 
     @CreatedDate<% if (databaseType === 'sql') { %>
     @Column(name = "created_date", nullable = false)<% } %><% if (databaseType === 'mongodb' || databaseType === 'couchbase') { %>
@@ -65,7 +65,7 @@ public abstract class AbstractAuditingEntity implements Serializable {
     @Column(name = "last_modified_by", length = 50)<% } %><% if (databaseType === 'mongodb' || databaseType === 'couchbase') { %>
     @Field("last_modified_by")<% } %>
     @JsonIgnore
-    private String lastModifiedBy;
+    private Long lastModifiedBy;
 
     @LastModifiedDate<% if (databaseType === 'sql') { %>
     @Column(name = "last_modified_date")<% } %><% if (databaseType === 'mongodb' || databaseType === 'couchbase') { %>
@@ -73,11 +73,30 @@ public abstract class AbstractAuditingEntity implements Serializable {
     @JsonIgnore
     private Instant lastModifiedDate = Instant.now();
 
-    public String getCreatedBy() {
+<%_ if (databaseType == 'sql') { _%>
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", insertable = false, updatable = false)
+    private User createdByUser;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "last_modified_by", insertable = false, updatable = false)
+    private User lastModifiedByUser;
+
+    public User getCreatedByUser() {
+        return createdByUser;
+    }
+
+    public User getLastModifiedByUser() {
+        return lastModifiedByUser;
+    }
+
+<%_ } _%>
+
+    public Long getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(String createdBy) {
+    public void setCreatedBy(Long createdBy) {
         this.createdBy = createdBy;
     }
 
@@ -89,11 +108,11 @@ public abstract class AbstractAuditingEntity implements Serializable {
         this.createdDate = createdDate;
     }
 
-    public String getLastModifiedBy() {
+    public Long getLastModifiedBy() {
         return lastModifiedBy;
     }
 
-    public void setLastModifiedBy(String lastModifiedBy) {
+    public void setLastModifiedBy(Long lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
 
