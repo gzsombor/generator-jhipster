@@ -380,6 +380,10 @@ public class User<% if (databaseType === 'sql' || databaseType === 'mongodb' || 
         this.persistentTokens = persistentTokens;
     }<% } %>
 
+    public String getFullName() {
+        return "" + firstName + " " + lastName + " (" + login + ')'; 
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

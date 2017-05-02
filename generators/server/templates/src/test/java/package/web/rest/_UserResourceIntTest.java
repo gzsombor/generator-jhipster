@@ -32,6 +32,7 @@ import <%= packageName %>.<%= mainClass %>;
 import <%=packageName%>.config.CacheConfiguration;
 <%_ } _%>
 <%_ if (databaseType !== 'cassandra' && databaseType !== 'couchbase') { _%>
+import <%= packageName %>.config.Constants;
 import <%= packageName %>.domain.Authority;
 <%_ } _%>
 import <%= packageName %>.domain.User;
@@ -64,6 +65,7 @@ import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 <%_ if (databaseType === 'sql') { _%>
@@ -485,9 +487,9 @@ public class UserResourceIntTest <% if (databaseType === 'cassandra') { %>extend
         <%_ } _%>
         managedUserVM.setLangKey(UPDATED_LANGKEY);
         <%_ if (databaseType !== 'cassandra') { _%>
-        managedUserVM.setCreatedBy(updatedUser.getCreatedBy());
+        managedUserVM.setCreatedBy(updatedUser.getCreatedByUserName());
         managedUserVM.setCreatedDate(updatedUser.getCreatedDate());
-        managedUserVM.setLastModifiedBy(updatedUser.getLastModifiedBy());
+        managedUserVM.setLastModifiedBy(updatedUser.getLastModifiedByUserName());
         managedUserVM.setLastModifiedDate(updatedUser.getLastModifiedDate());
         <%_ } _%>
         managedUserVM.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
@@ -538,9 +540,9 @@ public class UserResourceIntTest <% if (databaseType === 'cassandra') { %>extend
         <%_ } _%>
         managedUserVM.setLangKey(UPDATED_LANGKEY);
         <%_ if (databaseType !== 'cassandra') { _%>
-        managedUserVM.setCreatedBy(updatedUser.getCreatedBy());
+        managedUserVM.setCreatedBy(updatedUser.getCreatedByUserName());
         managedUserVM.setCreatedDate(updatedUser.getCreatedDate());
-        managedUserVM.setLastModifiedBy(updatedUser.getLastModifiedBy());
+        managedUserVM.setLastModifiedBy(updatedUser.getLastModifiedByUserName());
         managedUserVM.setLastModifiedDate(updatedUser.getLastModifiedDate());
         <%_ } _%>
         managedUserVM.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
@@ -610,9 +612,9 @@ public class UserResourceIntTest <% if (databaseType === 'cassandra') { %>extend
         <%_ } _%>
         managedUserVM.setLangKey(updatedUser.getLangKey());
         <%_ if (databaseType !== 'cassandra') { _%>
-        managedUserVM.setCreatedBy(updatedUser.getCreatedBy());
+        managedUserVM.setCreatedBy(updatedUser.getCreatedByUserName());
         managedUserVM.setCreatedDate(updatedUser.getCreatedDate());
-        managedUserVM.setLastModifiedBy(updatedUser.getLastModifiedBy());
+        managedUserVM.setLastModifiedBy(updatedUser.getLastModifiedByUserName());
         managedUserVM.setLastModifiedDate(updatedUser.getLastModifiedDate());
         <%_ } _%>
         managedUserVM.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
@@ -669,9 +671,9 @@ public class UserResourceIntTest <% if (databaseType === 'cassandra') { %>extend
         <%_ } _%>
         managedUserVM.setLangKey(updatedUser.getLangKey());
         <%_ if (databaseType !== 'cassandra') { _%>
-        managedUserVM.setCreatedBy(updatedUser.getCreatedBy());
+        managedUserVM.setCreatedBy(updatedUser.getCreatedByUserName());
         managedUserVM.setCreatedDate(updatedUser.getCreatedDate());
-        managedUserVM.setLastModifiedBy(updatedUser.getLastModifiedBy());
+        managedUserVM.setLastModifiedBy(updatedUser.getLastModifiedByUserName());
         managedUserVM.setLastModifiedDate(updatedUser.getLastModifiedDate());
         <%_ } _%>
         managedUserVM.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
@@ -791,9 +793,14 @@ public class UserResourceIntTest <% if (databaseType === 'cassandra') { %>extend
     public void testUserToUserDTO() {
         user.setId(DEFAULT_ID);
         <%_ if (databaseType !== 'cassandra') { _%>
-        user.setCreatedBy(DEFAULT_LOGIN);
+        User other = new User();
+        other.setId(Constants.SYSTEM_ACCOUNT_ID);
+        other.setFirstName("John");
+        other.setLastName("Doe");
+        other.setLogin("johndoe");
+        ReflectionTestUtils.setField(user, "createdByUser", other);
         user.setCreatedDate(Instant.now());
-        user.setLastModifiedBy(DEFAULT_LOGIN);
+        ReflectionTestUtils.setField(user, "lastModifiedByUser", other);
         user.setLastModifiedDate(Instant.now());
         <%_ } _%>
         <%_ if (databaseType !== 'cassandra' && databaseType !== 'couchbase') { _%>
@@ -819,9 +826,9 @@ public class UserResourceIntTest <% if (databaseType === 'cassandra') { %>extend
         <%_ } _%>
         assertThat(userDTO.getLangKey()).isEqualTo(DEFAULT_LANGKEY);
         <%_ if (databaseType !== 'cassandra') { _%>
-        assertThat(userDTO.getCreatedBy()).isEqualTo(DEFAULT_LOGIN);
+        assertThat(userDTO.getCreatedBy()).isEqualTo("John Doe (johndoe)");
         assertThat(userDTO.getCreatedDate()).isEqualTo(user.getCreatedDate());
-        assertThat(userDTO.getLastModifiedBy()).isEqualTo(DEFAULT_LOGIN);
+        assertThat(userDTO.getLastModifiedBy()).isEqualTo("John Doe (johndoe)");
         assertThat(userDTO.getLastModifiedDate()).isEqualTo(user.getLastModifiedDate());
         <%_ } _%>
         assertThat(userDTO.getAuthorities()).containsExactly(AuthoritiesConstants.USER);

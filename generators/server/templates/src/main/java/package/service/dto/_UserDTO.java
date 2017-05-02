@@ -97,9 +97,9 @@ public class UserDTO {
         <%_ } _%>
         this.langKey = user.getLangKey();
         <%_ if (databaseType === 'mongodb' || databaseType === 'couchbase' || databaseType === 'sql') { _%>
-        this.createdBy = user.getCreatedBy();
+        this.createdBy = user.getCreatedByUserName();
         this.createdDate = user.getCreatedDate();
-        this.lastModifiedBy = user.getLastModifiedBy();
+        this.lastModifiedBy = user.getLastModifiedByUserName();
         this.lastModifiedDate = user.getLastModifiedDate();
         <%_ } _%>
         <%_ if (databaseType === 'mongodb' || databaseType === 'sql') { _%>

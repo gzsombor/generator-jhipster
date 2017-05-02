@@ -82,7 +82,7 @@
             <column name="activation_key" type="varchar(20)"/>
             <column name="reset_key" type="varchar(20)"/>
             <%_ } _%>
-            <column name="created_by" type="varchar(50)">
+            <column name="created_by" type="bigint">
                 <constraints nullable="false"/>
             </column>
             <column name="created_date" type="timestamp" defaultValueDate="${now}">
@@ -93,7 +93,7 @@
                 <constraints nullable="true"/>
             </column>
             <%_ } _%>
-            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_by" type="bigint"/>
             <column name="last_modified_date" type="timestamp"/>
         </createTable>
     <%_ if (prodDatabaseType !== 'oracle') { _%>
