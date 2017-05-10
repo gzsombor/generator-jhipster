@@ -262,11 +262,11 @@ public class AccountResource {
     @PostMapping("/account")
     @Timed
     public UserDTO saveAccount(@Valid @RequestBody UserDTO userDTO) {
-        Optional<<%= pkType %>> userId = SecurityUtils.getCurrentUserLoginId();
+        final Optional<<%= pkType %>> userId = SecurityUtils.getCurrentUserLoginId();
         if (!userId.isPresent()) {
             throw new InternalServerErrorException("User could not be found");
         }
-        Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
+        final Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
         if (existingUser.isPresent() && (!existingUser.get().getId().equals(userId.get()))) {
             throw new EmailAlreadyUsedException();
         }
@@ -325,9 +325,9 @@ public class AccountResource {
     @DeleteMapping("/account/sessions/{series}")
     @Timed
     public void invalidateSession(@PathVariable String series) throws UnsupportedEncodingException {
-        String decodedSeries = URLDecoder.decode(series, "UTF-8");
-        SecurityUtils.getCurrentUserLogin()
-            .flatMap(userRepository::findOneByLogin)
+        final String decodedSeries = URLDecoder.decode(series, "UTF-8");
+        SecurityUtils.getCurrentUserLoginId()
+            .flatMap(userRepository::findOne)
             .ifPresent(u ->
                 persistentTokenRepository.findByUser(u).stream()
                     .filter(persistentToken -> StringUtils.equals(persistentToken.getSeries(), decodedSeries))<% if (databaseType === 'sql' || databaseType === 'mongodb') { %>
