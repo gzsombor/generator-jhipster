@@ -90,4 +90,25 @@ public class SecurityUtilsUnitTest {
         assertThat(SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN)).isFalse();
     }
 
+    @Test
+    public void testgetCurrentUserLoginWithId() {
+        TestUtil.setTestUser(1L, "admin");
+        final String login = SecurityUtils.getCurrentUserLogin();
+        assertThat(login).isEqualTo("admin");
+    }
+
+    @Test
+    public void testIsAuthenticatedWithId() {
+        TestUtil.setTestUser(1L, "admin");
+        final boolean isAuthenticated = SecurityUtils.isAuthenticated();
+        assertThat(isAuthenticated).isTrue();
+    }
+
+    @Test
+    public void testgetCurrentUserIdWithId() {
+        TestUtil.setTestUser(1L, "admin");
+        final Optional<Long> userId = SecurityUtils.getCurrentUserLoginId();
+        assertThat(userId).isEqualTo(Optional.of(1L));
+    }
+
 }
