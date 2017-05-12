@@ -277,10 +277,10 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
     public void setup() {
         MockitoAnnotations.initMocks(this);
         doNothing().when(mockMailService).sendActivationEmail(anyObject());
-        AccountResource accountResource =
+        final AccountResource accountResource =
             new AccountResource(userRepository, userService, mockMailService<% if (authenticationType === 'session') { %>, persistentTokenRepository<% } %>);
 
-        AccountResource accountUserMockResource =
+        final AccountResource accountUserMockResource =
             new AccountResource(userRepository, mockUserService, mockMailService<% if (authenticationType === 'session') { %>, persistentTokenRepository<% } %>);
         this.restMvc = MockMvcBuilders.standaloneSetup(accountResource)
             .setMessageConverters(httpMessageConverters)
@@ -313,14 +313,14 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
 
     @Test
     public void testGetExistingAccount() throws Exception {<% if (databaseType === 'sql' || databaseType === 'mongodb') { %>
-        Set<Authority> authorities = new HashSet<>();
-        Authority authority = new Authority();
+        final Set<Authority> authorities = new HashSet<>();
+        final Authority authority = new Authority();
         authority.setName(AuthoritiesConstants.ADMIN);
         authorities.add(authority);<% } %><% if (databaseType === 'cassandra' || databaseType === 'couchbase') { %>
-        Set<String> authorities = new HashSet<>();
+        final Set<String> authorities = new HashSet<>();
         authorities.add(AuthoritiesConstants.ADMIN);<% } %>
 
-        User user = new User();
+        final User user = new User();
         user.setLogin("test");
         user.setFirstName("john");
         user.setLastName("doe");
@@ -359,7 +359,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void testRegisterValid() throws Exception {
-        ManagedUserVM validUser = new ManagedUserVM();
+        final ManagedUserVM validUser = new ManagedUserVM();
         validUser.setLogin("joe");
         validUser.setPassword("password");
         validUser.setFirstName("Joe");
@@ -385,7 +385,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void testRegisterInvalidLogin() throws Exception {
-        ManagedUserVM invalidUser = new ManagedUserVM();
+        final ManagedUserVM invalidUser = new ManagedUserVM();
         invalidUser.setLogin("funky-log!n");// <-- invalid
         invalidUser.setPassword("password");
         invalidUser.setFirstName("Funky");
@@ -404,14 +404,14 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
                 .content(TestUtil.convertObjectToJsonBytes(invalidUser)))
             .andExpect(status().isBadRequest());
 
-        Optional<User> user = userRepository.findOneByEmailIgnoreCase("funky@example.com");
+        final Optional<User> user = userRepository.findOneByEmailIgnoreCase("funky@example.com");
         assertThat(user.isPresent()).isFalse();
     }
 
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void testRegisterInvalidEmail() throws Exception {
-        ManagedUserVM invalidUser = new ManagedUserVM();
+        final ManagedUserVM invalidUser = new ManagedUserVM();
         invalidUser.setLogin("bob");
         invalidUser.setPassword("password");
         invalidUser.setFirstName("Bob");
@@ -430,14 +430,14 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
                 .content(TestUtil.convertObjectToJsonBytes(invalidUser)))
             .andExpect(status().isBadRequest());
 
-        Optional<User> user = userRepository.findOneByLogin("bob");
+        final Optional<User> user = userRepository.findOneByLogin("bob");
         assertThat(user.isPresent()).isFalse();
     }
 
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void testRegisterInvalidPassword() throws Exception {
-        ManagedUserVM invalidUser = new ManagedUserVM();
+        final ManagedUserVM invalidUser = new ManagedUserVM();
         invalidUser.setLogin("bob");
         invalidUser.setPassword("123");// password with only 3 digits
         invalidUser.setFirstName("Bob");
@@ -456,14 +456,14 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
                 .content(TestUtil.convertObjectToJsonBytes(invalidUser)))
             .andExpect(status().isBadRequest());
 
-        Optional<User> user = userRepository.findOneByLogin("bob");
+        final Optional<User> user = userRepository.findOneByLogin("bob");
         assertThat(user.isPresent()).isFalse();
     }
 
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void testRegisterNullPassword() throws Exception {
-        ManagedUserVM invalidUser = new ManagedUserVM();
+        final ManagedUserVM invalidUser = new ManagedUserVM();
         invalidUser.setLogin("bob");
         invalidUser.setPassword(null);// invalid null password
         invalidUser.setFirstName("Bob");
@@ -490,7 +490,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
     @Transactional<% } %>
     public void testRegisterDuplicateLogin() throws Exception {
         // Good
-        ManagedUserVM validUser = new ManagedUserVM();
+        final ManagedUserVM validUser = new ManagedUserVM();
         validUser.setLogin("alice");
         validUser.setPassword("password");
         validUser.setFirstName("Alice");
@@ -504,7 +504,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
         validUser.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
 
         // Duplicate login, different email
-        ManagedUserVM duplicatedUser = new ManagedUserVM();
+        final ManagedUserVM duplicatedUser = new ManagedUserVM();
         duplicatedUser.setLogin(validUser.getLogin());
         duplicatedUser.setPassword(validUser.getPassword());
         duplicatedUser.setFirstName(validUser.getFirstName());
@@ -537,7 +537,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
                 .content(TestUtil.convertObjectToJsonBytes(duplicatedUser)))
             .andExpect(status().is4xxClientError());
 
-        Optional<User> userDup = userRepository.findOneByEmailIgnoreCase("alicejr@example.com");
+        final Optional<User> userDup = userRepository.findOneByEmailIgnoreCase("alicejr@example.com");
         assertThat(userDup.isPresent()).isFalse();
     }
 
@@ -545,7 +545,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
     @Transactional<% } %>
     public void testRegisterDuplicateEmail() throws Exception {
         // Good
-        ManagedUserVM validUser = new ManagedUserVM();
+        final ManagedUserVM validUser = new ManagedUserVM();
         validUser.setLogin("john");
         validUser.setPassword("password");
         validUser.setFirstName("John");
@@ -559,7 +559,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
         validUser.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
 
         // Duplicate email, different login
-        ManagedUserVM duplicatedUser = new ManagedUserVM();
+        final ManagedUserVM duplicatedUser = new ManagedUserVM();
         duplicatedUser.setLogin("johnjr");
         duplicatedUser.setPassword(validUser.getPassword());
         duplicatedUser.setFirstName(validUser.getFirstName());
@@ -593,7 +593,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
             .andExpect(status().is4xxClientError());
 
         // Duplicate email - with uppercase email address
-        ManagedUserVM userWithUpperCaseEmail = new ManagedUserVM();
+        final ManagedUserVM userWithUpperCaseEmail = new ManagedUserVM();
         userWithUpperCaseEmail.setId(validUser.getId());
         userWithUpperCaseEmail.setLogin("johnjr");
         userWithUpperCaseEmail.setPassword(validUser.getPassword());
@@ -619,14 +619,14 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
                 .content(TestUtil.convertObjectToJsonBytes(userWithUpperCaseEmail)))
             .andExpect(status().is4xxClientError());
 
-        Optional<User> userDup = userRepository.findOneByLogin("johnjr");
+        final Optional<User> userDup = userRepository.findOneByLogin("johnjr");
         assertThat(userDup.isPresent()).isFalse();
     }
 
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void testRegisterAdminIsIgnored() throws Exception {
-        ManagedUserVM validUser = new ManagedUserVM();
+        final ManagedUserVM validUser = new ManagedUserVM();
         validUser.setLogin("badguy");
         validUser.setPassword("password");
         validUser.setFirstName("Bad");
@@ -645,7 +645,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
                 .content(TestUtil.convertObjectToJsonBytes(validUser)))
             .andExpect(status().isCreated());
 
-        Optional<User> userDup = userRepository.findOneByLogin("badguy");
+        final Optional<User> userDup = userRepository.findOneByLogin("badguy");
         assertThat(userDup.isPresent()).isTrue();
         assertThat(userDup.get().getAuthorities()).hasSize(1)
             .containsExactly(<% if (databaseType === 'sql' || databaseType === 'mongodb') { %>authorityRepository.findOne(AuthoritiesConstants.USER)<% } %><% if (databaseType === 'cassandra' || databaseType === 'couchbase') { %>AuthoritiesConstants.USER<% } %>);
@@ -684,7 +684,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void testSaveAccount() throws Exception {
-        User user = new User();
+        final User user = new User();
         <%_ if (databaseType === 'cassandra') { _%>
         user.setId(UUID.randomUUID().toString());
         <%_ } _%>
@@ -697,7 +697,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
 
         TestUtil.setTestUser(user);
 
-        UserDTO userDTO = new UserDTO();
+        final UserDTO userDTO = new UserDTO();
         userDTO.setLogin("not-used");
         userDTO.setFirstName("firstname");
         userDTO.setLastName("lastname");
@@ -715,7 +715,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
                 .content(TestUtil.convertObjectToJsonBytes(userDTO)))
             .andExpect(status().isOk());
 
-        User updatedUser = userRepository.findOneByLogin(user.getLogin()).orElse(null);
+        final User updatedUser = userRepository.findOneByLogin(user.getLogin()).orElse(null);
         assertThat(updatedUser.getFirstName()).isEqualTo(userDTO.getFirstName());
         assertThat(updatedUser.getLastName()).isEqualTo(userDTO.getLastName());
         assertThat(updatedUser.getEmail()).isEqualTo(userDTO.getEmail());
@@ -729,7 +729,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void testSaveInvalidEmail() throws Exception {
-        User user = new User();
+        final User user = new User();
         <%_ if (databaseType === 'cassandra') { _%>
         user.setId(UUID.randomUUID().toString());
         <%_ } _%>
@@ -742,7 +742,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
 
         TestUtil.setTestUser(user);
 
-        UserDTO userDTO = new UserDTO();
+        final UserDTO userDTO = new UserDTO();
         userDTO.setLogin("not-used");
         userDTO.setFirstName("firstname");
         userDTO.setLastName("lastname");
@@ -766,7 +766,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void testSaveExistingEmail() throws Exception {
-        User user = new User();
+        final User user = new User();
         <%_ if (databaseType === 'cassandra') { _%>
         user.setId(UUID.randomUUID().toString());
         <%_ } _%>
@@ -779,7 +779,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
 
         TestUtil.setTestUser(user);
 
-        User anotherUser = new User();
+        final User anotherUser = new User();
         <%_ if (databaseType === 'cassandra') { _%>
         anotherUser.setId(UUID.randomUUID().toString());
         <%_ } _%>
@@ -790,7 +790,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
 
         userRepository.save<% if (databaseType === 'sql') { %>AndFlush<% } %>(anotherUser);
 
-        UserDTO userDTO = new UserDTO();
+        final UserDTO userDTO = new UserDTO();
         userDTO.setLogin("not-used");
         userDTO.setFirstName("firstname");
         userDTO.setLastName("lastname");
@@ -808,14 +808,14 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
                 .content(TestUtil.convertObjectToJsonBytes(userDTO)))
             .andExpect(status().isBadRequest());
 
-        User updatedUser = userRepository.findOneByLogin("save-existing-email").orElse(null);
+        final User updatedUser = userRepository.findOneByLogin("save-existing-email").orElse(null);
         assertThat(updatedUser.getEmail()).isEqualTo("save-existing-email@example.com");
     }
 
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void testSaveExistingEmailAndLogin() throws Exception {
-        User user = new User();
+        final User user = new User();
         <%_ if (databaseType === 'cassandra') { _%>
         user.setId(UUID.randomUUID().toString());
         <%_ } _%>
@@ -828,7 +828,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
 
         TestUtil.setTestUser(user);
 
-        UserDTO userDTO = new UserDTO();
+        final UserDTO userDTO = new UserDTO();
         userDTO.setLogin("not-used");
         userDTO.setFirstName("firstname");
         userDTO.setLastName("lastname");
@@ -846,14 +846,14 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
                 .content(TestUtil.convertObjectToJsonBytes(userDTO)))
             .andExpect(status().isOk());
 
-        User updatedUser = userRepository.findOneByLogin("save-existing-email-and-login").orElse(null);
+        final User updatedUser = userRepository.findOneByLogin("save-existing-email-and-login").orElse(null);
         assertThat(updatedUser.getEmail()).isEqualTo("save-existing-email-and-login@example.com");
     }
 
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void testChangePassword() throws Exception {
-        User user = new User();
+        final User user = new User();
         <%_ if (databaseType === 'cassandra') { _%>
         user.setId(UUID.randomUUID().toString());
         <%_ } _%>
@@ -867,14 +867,14 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
         restMvc.perform(post("/api/account/change-password").content("new password"))
             .andExpect(status().isOk());
 
-        User updatedUser = userRepository.findOneByLogin("change-password").orElse(null);
+        final User updatedUser = userRepository.findOneByLogin("change-password").orElse(null);
         assertThat(passwordEncoder.matches("new password", updatedUser.getPassword())).isTrue();
     }
 
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void testChangePasswordTooSmall() throws Exception {
-        User user = new User();
+        final User user = new User();
         <%_ if (databaseType === 'cassandra') { _%>
         user.setId(UUID.randomUUID().toString());
         <%_ } _%>
@@ -888,14 +888,14 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
         restMvc.perform(post("/api/account/change-password").content("new"))
             .andExpect(status().isBadRequest());
 
-        User updatedUser = userRepository.findOneByLogin("change-password-too-small").orElse(null);
+        final User updatedUser = userRepository.findOneByLogin("change-password-too-small").orElse(null);
         assertThat(updatedUser.getPassword()).isEqualTo(user.getPassword());
     }
 
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void testChangePasswordTooLong() throws Exception {
-        User user = new User();
+        final User user = new User();
         <%_ if (databaseType === 'cassandra') { _%>
         user.setId(UUID.randomUUID().toString());
         <%_ } _%>
@@ -909,14 +909,14 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
         restMvc.perform(post("/api/account/change-password").content(RandomStringUtils.random(101)))
             .andExpect(status().isBadRequest());
 
-        User updatedUser = userRepository.findOneByLogin("change-password-too-long").orElse(null);
+        final User updatedUser = userRepository.findOneByLogin("change-password-too-long").orElse(null);
         assertThat(updatedUser.getPassword()).isEqualTo(user.getPassword());
     }
 
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void testChangePasswordEmpty() throws Exception {
-        User user = new User();
+        final User user = new User();
         <%_ if (databaseType === 'cassandra') { _%>
         user.setId(UUID.randomUUID().toString());
         <%_ } _%>
@@ -930,7 +930,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
         restMvc.perform(post("/api/account/change-password").content(RandomStringUtils.random(0)))
             .andExpect(status().isBadRequest());
 
-        User updatedUser = userRepository.findOneByLogin("change-password-empty").orElse(null);
+        final User updatedUser = userRepository.findOneByLogin("change-password-empty").orElse(null);
         assertThat(updatedUser.getPassword()).isEqualTo(user.getPassword());
     }
     <%_ if (authenticationType === 'session') { _%>
@@ -938,7 +938,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void testGetCurrentSessions()  throws Exception {
-        User user = new User();
+        final User user = new User();
         <%_ if (databaseType === 'cassandra') { _%>
         user.setId(UUID.randomUUID().toString());
         <%_ } _%>
@@ -949,7 +949,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
 
         TestUtil.setTestUser(user);
 
-        PersistentToken token = new PersistentToken();
+        final PersistentToken token = new PersistentToken();
         token.setSeries("current-sessions");<% if (databaseType === 'sql' || databaseType === 'mongodb') { %>
         token.setUser(user);<% } else { %><% if (databaseType === 'cassandra') { %>
         token.setUserId(user.getId());<% } else { %>
@@ -972,7 +972,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void testInvalidateSession() throws Exception {
-        User user = new User();
+        final User user = new User();
         <%_ if (databaseType === 'cassandra') { _%>
         user.setId(UUID.randomUUID().toString());
         <%_ } _%>
@@ -983,7 +983,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
 
         TestUtil.setTestUser(user);
 
-        PersistentToken token = new PersistentToken();
+        final PersistentToken token = new PersistentToken();
         token.setSeries("invalidate-session");<% if (databaseType === 'sql' || databaseType === 'mongodb') { %>
         token.setUser(user);<% } else { %><% if (databaseType === 'cassandra') { %>
         token.setUserId(user.getId());<% } else { %>
@@ -1007,7 +1007,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void testRequestPasswordReset() throws Exception {
-        User user = new User();
+        final User user = new User();
         <%_ if (databaseType === 'cassandra') { _%>
         user.setId(UUID.randomUUID().toString());
         <%_ } _%>
@@ -1051,7 +1051,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void testFinishPasswordReset() throws Exception {
-        User user = new User();
+        final User user = new User();
         <%_ if (databaseType === 'cassandra') { _%>
         user.setId(UUID.randomUUID().toString());
         <%_ } _%>
@@ -1062,7 +1062,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
         user.setResetKey("reset key");
         userRepository.save<% if (databaseType === 'sql') { %>AndFlush<% } %>(user);
 
-        KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
+        final KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
         keyAndPassword.setKey(user.getResetKey());
         keyAndPassword.setNewPassword("new password");
 
@@ -1072,14 +1072,14 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
                 .content(TestUtil.convertObjectToJsonBytes(keyAndPassword)))
             .andExpect(status().isOk());
 
-        User updatedUser = userRepository.findOneByLogin(user.getLogin()).orElse(null);
+        final User updatedUser = userRepository.findOneByLogin(user.getLogin()).orElse(null);
         assertThat(passwordEncoder.matches(keyAndPassword.getNewPassword(), updatedUser.getPassword())).isTrue();
     }
 
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void testFinishPasswordResetTooSmall() throws Exception {
-        User user = new User();
+        final User user = new User();
         <%_ if (databaseType === 'cassandra') { _%>
         user.setId(UUID.randomUUID().toString());
         <%_ } _%>
@@ -1090,7 +1090,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
         user.setResetKey("reset key too small");
         userRepository.save<% if (databaseType === 'sql') { %>AndFlush<% } %>(user);
 
-        KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
+        final KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
         keyAndPassword.setKey(user.getResetKey());
         keyAndPassword.setNewPassword("foo");
 
@@ -1100,7 +1100,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
                 .content(TestUtil.convertObjectToJsonBytes(keyAndPassword)))
             .andExpect(status().isBadRequest());
 
-        User updatedUser = userRepository.findOneByLogin(user.getLogin()).orElse(null);
+        final User updatedUser = userRepository.findOneByLogin(user.getLogin()).orElse(null);
         assertThat(passwordEncoder.matches(keyAndPassword.getNewPassword(), updatedUser.getPassword())).isFalse();
     }
 
@@ -1108,7 +1108,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
     @Test<% if (databaseType === 'sql') { %>
     @Transactional<% } %>
     public void testFinishPasswordResetWrongKey() throws Exception {
-        KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
+        final KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
         keyAndPassword.setKey("wrong reset key");
         keyAndPassword.setNewPassword("new password");
 
