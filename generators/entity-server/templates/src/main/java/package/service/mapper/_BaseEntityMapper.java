@@ -23,17 +23,17 @@ import java.util.List;
 /**
  * Contract for a generic dto to entity mapper.
  *
- * @param <D> - DTO type parameter.
- * @param <E> - Entity type parameter.
+ * @param <DTO> - DTO type parameter.
+ * @param <ENTITY> - Entity type parameter.
  */
 
-public interface EntityMapper <D, E> {
+public interface EntityMapper <DTO, ENTITY> {
 
-    E toEntity(D dto);
+    ENTITY toEntity(DTO dto);
 
-    D toDto(E entity);
+    DTO toDto(ENTITY entity);
 
-    List <E> toEntity(List<D> dtoList);
+    List <ENTITY> toEntity(List<DTO> dtoList);
 
-    List <D> toDto(List<E> entityList);
+    List <DTO> toDto(List<ENTITY> entityList);
 }
