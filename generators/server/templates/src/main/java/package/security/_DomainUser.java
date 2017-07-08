@@ -14,20 +14,36 @@ public class DomainUser extends User {
 
     private static final long serialVersionUID = 1L;
     private final Long id;
+    private final String language;
 
-    public DomainUser(Long id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+    public DomainUser(Long id, String username, String password, Collection<? extends GrantedAuthority> authorities, String language) {
         super(username, password, authorities);
         this.id = id;
+        this.language = language;
     }
 
     public DomainUser(Long id, String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked,
-            Collection<? extends GrantedAuthority> authorities) {
+            Collection<? extends GrantedAuthority> authorities, String language) {
         super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
         this.id = id;
+        this.language = language;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public boolean hasRole(String role) {
+        for (final GrantedAuthority authority : getAuthorities()) {
+            if (authority.getAuthority().equals(role)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

@@ -25,6 +25,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import <%= packageName %>.web.rest.TestUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;

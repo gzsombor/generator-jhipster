@@ -282,6 +282,7 @@ function writeFiles() {
                 this.template(`${SERVER_MAIN_SRC_DIR}package/config/_OAuth2Configuration.java`, `${javaDir}config/OAuth2Configuration.java`);
                 this.template(`${SERVER_MAIN_SRC_DIR}package/security/_OAuth2AuthenticationSuccessHandler.java`, `${javaDir}security/OAuth2AuthenticationSuccessHandler.java`);
             } else {
+                this.template(`${SERVER_MAIN_SRC_DIR}package/security/_DomainUser.java`, `${javaDir}security/DomainUser.java`);
                 this.template(`${SERVER_MAIN_SRC_DIR}package/security/_DomainUserDetailsService.java`, `${javaDir}security/DomainUserDetailsService.java`);
                 this.template(`${SERVER_MAIN_SRC_DIR}package/security/_UserNotActivatedException.java`, `${javaDir}security/UserNotActivatedException.java`);
             }

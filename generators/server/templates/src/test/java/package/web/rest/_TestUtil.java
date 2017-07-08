@@ -184,7 +184,7 @@ public class TestUtil {
         final List<SimpleGrantedAuthority> authorityList = authorities.map(SimpleGrantedAuthority::new).collect(Collectors.toList());
         final SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
         securityContext
-                .setAuthentication(new UsernamePasswordAuthenticationToken(new DomainUser(userId, name, "password", authorityList), "password", authorityList));
+                .setAuthentication(new UsernamePasswordAuthenticationToken(new DomainUser(userId, name, "password", authorityList, "en"), "password", authorityList));
         SecurityContextHolder.setContext(securityContext);
     }
 
