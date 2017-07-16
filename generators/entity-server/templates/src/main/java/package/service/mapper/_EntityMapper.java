@@ -18,6 +18,8 @@
 -%>
 package <%=packageName%>.service.mapper;
 
+import java.util.List;
+
 import <%=packageName%>.domain.*;
 import <%=packageName%>.service.dto.<%= entityClass %>DTO;
 import <%=packageName%>.service.dto.<%= entityClass %>UpdateDTO;
