@@ -38,7 +38,7 @@ import { <% if (pagination === 'pagination' || pagination === 'pager') { %>Resol
 import { JhiPaginationUtil } from 'ng-jhipster';
 <%_ } _%>
 
-import { UserRouteAccessService } from '../../shared';
+import { UserRouteAccessService, AuthoritiesConstants } from '../../shared';
 import { <%= entityAngularName %>Component } from './<%= entityFileName %>.component';
 import { <%= entityAngularName %>DetailComponent } from './<%= entityFileName %>-detail.component';
 import { <%= entityAngularName %>PopupComponent } from './<%= entityFileName %>-dialog.component';
@@ -78,7 +78,7 @@ export const <%= entityInstance %>Route: Routes = [
         },
         <%_ } _%>
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: [AuthoritiesConstants.USER],
             pageTitle: <% if (enableTranslation){ %>'<%= angularAppName %>.<%= entityTranslationKey %>.home.title'<% }else{ %>'<%= entityClassPlural %>'<% } %>
         },
         canActivate: [UserRouteAccessService]
@@ -86,7 +86,7 @@ export const <%= entityInstance %>Route: Routes = [
         path: '<%= entityUrl %>/:id',
         component: <%= entityAngularName %>DetailComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: [AuthoritiesConstants.USER],
             pageTitle: <% if (enableTranslation){ %>'<%= angularAppName %>.<%= entityTranslationKey %>.home.title'<% }else{ %>'<%= entityClassPlural %>'<% } %>
         },
         canActivate: [UserRouteAccessService]
@@ -98,7 +98,7 @@ export const <%= entityInstance %>PopupRoute: Routes = [
         path: '<%= entityUrl %>-new',
         component: <%= entityAngularName %>PopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: [AuthoritiesConstants.USER],
             pageTitle: <% if (enableTranslation){ %>'<%= angularAppName %>.<%= entityTranslationKey %>.home.title'<% }else{ %>'<%= entityClassPlural %>'<% } %>
         },
         canActivate: [UserRouteAccessService],
@@ -108,7 +108,7 @@ export const <%= entityInstance %>PopupRoute: Routes = [
         path: '<%= entityUrl %>/:id/edit',
         component: <%= entityAngularName %>PopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: [AuthoritiesConstants.USER],
             pageTitle: <% if (enableTranslation){ %>'<%= angularAppName %>.<%= entityTranslationKey %>.home.title'<% }else{ %>'<%= entityClassPlural %>'<% } %>
         },
         canActivate: [UserRouteAccessService],
@@ -118,7 +118,7 @@ export const <%= entityInstance %>PopupRoute: Routes = [
         path: '<%= entityUrl %>/:id/delete',
         component: <%= entityAngularName %>DeletePopupComponent,
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: [AuthoritiesConstants.USER],
             pageTitle: <% if (enableTranslation){ %>'<%= angularAppName %>.<%= entityTranslationKey %>.home.title'<% }else{ %>'<%= entityClassPlural %>'<% } %>
         },
         canActivate: [UserRouteAccessService],

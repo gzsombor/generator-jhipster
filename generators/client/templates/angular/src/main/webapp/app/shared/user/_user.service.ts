@@ -22,6 +22,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { SERVER_API_URL } from '../../app.constants';
 import { User } from './user.model';
+import { AuthoritiesConstants } from '../auth/authorities-constants';
 import { createRequestOption } from '../model/request-util';
 
 @Injectable()
@@ -57,7 +58,7 @@ export class UserService {
 <%_ if (databaseType === 'sql' || databaseType === 'mongodb' || databaseType === 'couchbase') { _%>
         return this.http.get<string[]>(SERVER_API_URL + '<%- apiUaaPath %>api/users/authorities');
 <%_ } else { _%>
-        return Observable.of(['ROLE_USER', 'ROLE_ADMIN']);
+        return Observable.of([AuthoritiesConstants.USER, AuthoritiesConstants.ADMIN]);
 <%_ } _%>
     }
 <% } %>
