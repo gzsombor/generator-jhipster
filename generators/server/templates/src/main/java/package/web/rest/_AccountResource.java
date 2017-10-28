@@ -93,7 +93,6 @@ public class AccountResource {
             } else {
                 // Allow Spring Security Test to be used to mock users in the database
                 return userService.getUserWithAuthorities()
-                    .map(UserDTO::new)
                     .orElseThrow(() -> new InternalServerErrorException("User could not be found"));
             }
         } else {
@@ -329,7 +328,7 @@ public class AccountResource {
     public void invalidateSession(@PathVariable String series) throws UnsupportedEncodingException {
         final String decodedSeries = URLDecoder.decode(series, "UTF-8");
         SecurityUtils.getCurrentUserLoginId()
-            .flatMap(userRepository::findOne)
+            .map(userRepository::findOne)
             .ifPresent(u ->
                 persistentTokenRepository.findByUser(u).stream()
                     .filter(persistentToken -> StringUtils.equals(persistentToken.getSeries(), decodedSeries))<% if (databaseType === 'sql' || databaseType === 'mongodb') { %>

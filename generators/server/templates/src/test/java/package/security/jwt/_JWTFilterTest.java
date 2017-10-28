@@ -19,7 +19,9 @@
 package <%=packageName%>.security.jwt;
 
 import <%=packageName%>.security.AuthoritiesConstants;
+import <%=packageName%>.security.DomainUser;
 import io.github.jhipster.config.JHipsterProperties;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -53,11 +55,7 @@ public class JWTFilterTest {
 
     @Test
     public void testJWTFilter() throws Exception {
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-            "test-user",
-            "test-password",
-            Collections.singletonList(new SimpleGrantedAuthority(AuthoritiesConstants.USER))
-        );
+        UsernamePasswordAuthenticationToken authentication = createAuthentication();
         String jwt = tokenProvider.createToken(authentication, false);
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader(JWTConfigurer.AUTHORIZATION_HEADER, "Bearer " + jwt);
@@ -108,15 +106,22 @@ public class JWTFilterTest {
 
     @Test
     public void testJWTFilterWrongScheme() throws Exception {
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-            "test-user",
-            "test-password",
-            Collections.singletonList(new SimpleGrantedAuthority(AuthoritiesConstants.USER))
-        );
+        UsernamePasswordAuthenticationToken authentication = createAuthentication();
         String jwt = tokenProvider.createToken(authentication, false);
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader(JWTConfigurer.AUTHORIZATION_HEADER, "Basic " + jwt);
         request.setRequestURI("/api/test");
+    }
+
+    private UsernamePasswordAuthenticationToken createAuthentication() {
+        DomainUser user = new DomainUser(null, "test-user", "test-password",
+                Collections.singletonList(new SimpleGrantedAuthority(AuthoritiesConstants.USER)), null);
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+            user,
+            user.getPassword(),
+            user.getAuthorities()
+        );
+        return authentication;
     }
 
 }

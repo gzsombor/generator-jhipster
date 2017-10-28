@@ -35,6 +35,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -45,10 +46,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+<%_ 
+  hasUserEntity = !skipUserManagement || (applicationType === 'monolith' && authenticationType === 'oauth2');
+  if (hasUserEntity) { _%>
+<%_ if (databaseType === 'sql' || databaseType === 'mongodb') { _%>
 import <%=packageName%>.domain.Authority;
+<%_ } _%>
 import <%=packageName%>.domain.User;
 import <%=packageName%>.security.DomainUser;
-
+<%_ } _%>
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -180,11 +186,29 @@ public class TestUtil {
         return dfcs;
     }
 
-    private static void setTestUser(long userId, String name, Stream<String> authorities) {
+    <%_ if (hasUserEntity) { _%>
+    private static DomainUser createUserDetails(<%= pkType %> userId, String name, Stream<String> authorities) {
         final List<SimpleGrantedAuthority> authorityList = authorities.map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+        return new DomainUser(userId, name, "password", authorityList, "en");
+    }
+
+    /**
+     * Creates an {@link UserDetails} object, from a domain {@link User} entity.
+     * @param user to source the parameters
+     * @return the {@link DomainUser} which can be used by spring security.
+     */
+    public static DomainUser createUserDetails(User user) {
+        <%_ if (databaseType === 'sql' || databaseType === 'mongodb') { _%>
+        return createUserDetails(user.getId(), user.getLogin(), user.getAuthorities().stream().map(Authority::getName));
+        <%_ } else { _%>
+        return createUserDetails(user.getId(), user.getLogin(), user.getAuthorities().stream());
+        <%_ } _%>
+    }
+
+    private static void setTestUser(DomainUser domainUser) {
         final SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
         securityContext
-                .setAuthentication(new UsernamePasswordAuthenticationToken(new DomainUser(userId, name, "password", authorityList, "en"), "password", authorityList));
+                .setAuthentication(new UsernamePasswordAuthenticationToken(domainUser, domainUser.getPassword(), domainUser.getAuthorities()));
         SecurityContextHolder.setContext(securityContext);
     }
 
@@ -192,8 +216,8 @@ public class TestUtil {
      * Configures Sprint to use the provided informations as the currently
      * authenticated user.
      */
-    public static void setTestUser(long userId, String name, String... authorities) {
-        setTestUser(userId, name, Arrays.asList(authorities).stream());
+    public static void setTestUser(<%= pkType %> userId, String name, String... authorities) {
+        setTestUser(createUserDetails(userId, name, Arrays.asList(authorities).stream()));
     }
 
     /**
@@ -201,6 +225,7 @@ public class TestUtil {
      * Spring.
      */
     public static void setTestUser(User user) {
-        setTestUser(user.getId(), user.getLogin(), user.getAuthorities().stream().map(Authority::getName));
+        setTestUser(createUserDetails(user));
     }
+    <%_ } _%>
 }

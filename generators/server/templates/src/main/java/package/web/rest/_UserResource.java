@@ -225,7 +225,7 @@ public class UserResource {
      */
     @GetMapping("/users/{id}")
     @Timed
-    public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
+    public ResponseEntity<UserDTO> getUser(@PathVariable <%= pkType %> id) {
         log.debug("REST request to get User : {}", id);
         return ResponseUtil.wrapOrNotFound(
             userService.getUserWithAuthorities(id));
@@ -241,7 +241,7 @@ public class UserResource {
     @DeleteMapping("/users/{id}")
     @Timed
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<UserDTO> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<UserDTO> deleteUser(@PathVariable <%= pkType %> id) {
         log.debug("REST request to delete User: {}", id);
         Optional<UserDTO> deletedUser = userService.deleteUser(id);
         return ResponseUtil.wrapOrNotFound(deletedUser,

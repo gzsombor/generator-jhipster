@@ -27,12 +27,19 @@ public final class Constants {
     public static final String LOGIN_REGEX = "^[_'.@A-Za-z0-9-]*$";
 
     public static final String SYSTEM_ACCOUNT = "system";
-    public static final Long SYSTEM_ACCOUNT_ID = 1L;
     public static final String ANONYMOUS_USER = "anonymoususer";
     public static final String DEFAULT_LANGUAGE = "<%= nativeLanguage %>";
     <% if (databaseType === 'couchbase') { %>
     public static final String ID_DELIMITER = "__";
     <% } %>
+
+<%_ if (pkType === 'Long') { _%>
+    public static final Long SYSTEM_ACCOUNT_ID = 1L;
+    public static final Long ADMIN_ID = 3L;
+<%_ } else if (pkType === 'String') { _%>
+    public static final String SYSTEM_ACCOUNT_ID = "user-0";
+    public static final String ADMIN_ID = "user-2";
+<%_ } _%>
 
     private Constants() {
     }

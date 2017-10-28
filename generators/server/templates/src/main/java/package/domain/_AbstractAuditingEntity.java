@@ -41,6 +41,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.JoinColumn;<% } %>
 
+<%_
+ noUserEntity = skipUserManagement && (applicationType !== 'monolith' || authenticationType !== 'oauth2');
+ auditorIdType = noUserEntity ? 'String' : pkType;
+ _%>
 /**
  * Base abstract class for entities which will hold definitions for created, last modified by and created,
  * last modified by date.
@@ -56,7 +60,7 @@ public abstract class AbstractAuditingEntity implements Serializable {
     @Column(name = "created_by", nullable = false, updatable = false)<% } %><% if (databaseType === 'mongodb' || databaseType === 'couchbase') { %>
     @Field("created_by")<% } %>
     @JsonIgnore
-    private Long createdBy;
+    private <%= auditorIdType %> createdBy;
 
     @CreatedDate<% if (databaseType === 'sql') { %>
     @Column(name = "created_date", nullable = false)<% } %><% if (databaseType === 'mongodb' || databaseType === 'couchbase') { %>
@@ -68,7 +72,7 @@ public abstract class AbstractAuditingEntity implements Serializable {
     @Column(name = "last_modified_by")<% } %><% if (databaseType === 'mongodb' || databaseType === 'couchbase') { %>
     @Field("last_modified_by")<% } %>
     @JsonIgnore
-    private Long lastModifiedBy;
+    private <%= auditorIdType %> lastModifiedBy;
 
     @LastModifiedDate<% if (databaseType === 'sql') { %>
     @Column(name = "last_modified_date")<% } %><% if (databaseType === 'mongodb' || databaseType === 'couchbase') { %>
@@ -76,7 +80,7 @@ public abstract class AbstractAuditingEntity implements Serializable {
     @JsonIgnore
     private Instant lastModifiedDate = Instant.now();
 
-<%_ if (databaseType == 'sql') { _%>
+<%_ if (databaseType === 'sql' && !noUserEntity) { _%>
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by", insertable = false, updatable = false)
     private User createdByUser;
@@ -95,11 +99,11 @@ public abstract class AbstractAuditingEntity implements Serializable {
 
 <%_ } _%>
 
-    public Long getCreatedBy() {
+    public <%= auditorIdType %> getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(Long createdBy) {
+    public void setCreatedBy(<%= auditorIdType %> createdBy) {
         this.createdBy = createdBy;
     }
 
@@ -111,11 +115,11 @@ public abstract class AbstractAuditingEntity implements Serializable {
         this.createdDate = createdDate;
     }
 
-    public Long getLastModifiedBy() {
+    public <%= auditorIdType %> getLastModifiedBy() {
         return lastModifiedBy;
     }
 
-    public void setLastModifiedBy(Long lastModifiedBy) {
+    public void setLastModifiedBy(<%= auditorIdType %> lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
 
@@ -127,6 +131,7 @@ public abstract class AbstractAuditingEntity implements Serializable {
         this.lastModifiedDate = lastModifiedDate;
     }
 
+    <%_ if (databaseType === 'sql' && !noUserEntity) { _%>
     public String getCreatedByUserName() {
         return createdByUser != null ? createdByUser.getFullName() : null;
     }
@@ -134,4 +139,15 @@ public abstract class AbstractAuditingEntity implements Serializable {
     public String getLastModifiedByUserName() {
         return lastModifiedByUser != null ? lastModifiedByUser.getFullName() : null;
     }
+    <%_ } else { _%>
+    @Deprecated
+    public String getCreatedByUserName() {
+        return createdBy;
+    }
+
+    @Deprecated
+    public String getLastModifiedByUserName() {
+        return lastModifiedBy;
+    }
+    <%_ } _%>
 }

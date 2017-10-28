@@ -57,6 +57,7 @@ import org.springframework.scheduling.annotation.Scheduled;
     <%_ } _%>
 <%_ } _%>
 <%_ if (authenticationType === 'oauth2' && applicationType === 'monolith') { _%>
+import <%=packageName%>.security.DomainUser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -298,7 +299,7 @@ public class UserService {
      */
     public Optional<UserDTO>  updateUser(String firstName, String lastName, String email, String langKey<% if (databaseType === 'mongodb' || databaseType === 'couchbase' || databaseType === 'sql') { %>, String imageUrl<% } %>) {
         return SecurityUtils.getCurrentUserLoginId()
-            .flatMap(userRepository::findOne)
+            .map(userRepository::findOne)
             .map(user -> {
                 user.setFirstName(firstName);
                 user.setLastName(lastName);
@@ -371,7 +372,7 @@ public class UserService {
             .map(UserDTO::new);
     }
 
-    public Optional<UserDTO> deleteUser(Long id) {
+    public Optional<UserDTO> deleteUser(<%= pkType %> id) {
         return Optional.ofNullable(id).map(userRepository::findOne).map(user -> {
             <%_ if (enableSocialSignIn) { _%>
             socialService.deleteUserSocialConnection(user.getLogin());
@@ -392,7 +393,7 @@ public class UserService {
 
     public void changePassword(String password) {
         SecurityUtils.getCurrentUserLoginId()
-            .flatMap(userRepository::findOne)
+            .map(userRepository::findOne)
             .ifPresent(user -> {
                 final String encryptedPassword = passwordEncoder.encode(password);
                 user.setPassword(encryptedPassword);
@@ -450,7 +451,7 @@ public class UserService {
     public Optional<UserDTO> getUserWithAuthorities() {
         <%_ if (databaseType === 'sql') { _%>
         return SecurityUtils.getCurrentUserLoginId()
-                .map(userRepository::findOneWithAuthoritiesById)
+                .flatMap(userRepository::findOneWithAuthoritiesById)
         <%_ } else { // MongoDB, Couchbase and and Cassandra _%>
         return userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin())
         <%_ } _%>
@@ -521,28 +522,23 @@ public class UserService {
         Set<<% if (databaseType === 'couchbase') { %>String<% } else { %>Authority<% } %>> userAuthorities = extractAuthorities(authentication, details);
         user.setAuthorities(userAuthorities);
 
-        // convert Authorities to GrantedAuthorities
-        Set<GrantedAuthority> grantedAuthorities = userAuthorities.stream()
-        <%_ if (databaseType !== 'couchbase') { _%>
-            .map(Authority::getName)
-        <%_ } _%>
-            .map(SimpleGrantedAuthority::new)
-            .collect(Collectors.toSet());
-
-        UsernamePasswordAuthenticationToken token = getToken(details, user, grantedAuthorities);
+        User syncedUser = syncUserWithIdP(details, user);
+        UsernamePasswordAuthenticationToken token = getToken(details, syncedUser);
         authentication = new OAuth2Authentication(authentication.getOAuth2Request(), token);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return new UserDTO(syncUserWithIdP(details, user));
+        return new UserDTO();
     }
 
     private User syncUserWithIdP(Map<String, Object> details, User user) {
         // save account in to sync users between IdP and JHipster's local database
         Optional<User> existingUser = userRepository.findOneByLogin(user.getLogin());
         if (existingUser.isPresent()) {
+            User dbUser = existingUser.get();
+            user.setId(dbUser.getId());
             // if IdP sends last updated information, use it to determine if an update should happen
             if (details.get("updated_at") != null) {
-                Instant dbModifiedDate = existingUser.get().getLastModifiedDate();
+                Instant dbModifiedDate = dbUser.getLastModifiedDate();
                 Instant idpModifiedDate = new Date(Long.valueOf((Integer) details.get("updated_at"))).toInstant();
                 if (idpModifiedDate.isAfter(dbModifiedDate)) {
                     log.debug("Updating user '{}' in local database...", user.getLogin());
@@ -566,11 +562,18 @@ public class UserService {
         return user;
     }
 
-    private static UsernamePasswordAuthenticationToken getToken(Map<String, Object> details, User user, Set<GrantedAuthority> grantedAuthorities) {
+    private static UsernamePasswordAuthenticationToken getToken(Map<String, Object> details, User user) {
+        // convert Authorities to GrantedAuthorities
+        Set<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
+        <%_ if (databaseType !== 'couchbase') { _%>
+            .map(Authority::getName)
+        <%_ } _%>
+            .map(SimpleGrantedAuthority::new)
+            .collect(Collectors.toSet());
+
         // create UserDetails so #{principal.username} works
-        UserDetails userDetails =
-            new org.springframework.security.core.userdetails.User(user.getLogin(),
-            "N/A", grantedAuthorities);
+        DomainUser userDetails = new DomainUser(user.getId(), user.getLogin(),
+            "N/A", grantedAuthorities, user.getLangKey());
         // update Spring Security Authorities to match groups claim from IdP
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
             userDetails, "N/A", grantedAuthorities);

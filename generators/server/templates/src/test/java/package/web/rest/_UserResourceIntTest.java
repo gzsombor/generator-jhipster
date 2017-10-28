@@ -792,15 +792,17 @@ public class UserResourceIntTest <% if (databaseType === 'cassandra') { %>extend
     @Test
     public void testUserToUserDTO() {
         user.setId(DEFAULT_ID);
-        <%_ if (databaseType !== 'cassandra') { _%>
+        <%_ if (databaseType === 'sql') { _%>
         User other = new User();
         other.setId(Constants.SYSTEM_ACCOUNT_ID);
         other.setFirstName("John");
         other.setLastName("Doe");
         other.setLogin("johndoe");
         ReflectionTestUtils.setField(user, "createdByUser", other);
-        user.setCreatedDate(Instant.now());
         ReflectionTestUtils.setField(user, "lastModifiedByUser", other);
+        <%_ } _%>
+        <%_ if (databaseType !== 'cassandra') { _%>
+        user.setCreatedDate(Instant.now());
         user.setLastModifiedDate(Instant.now());
         <%_ } _%>
         <%_ if (databaseType !== 'cassandra' && databaseType !== 'couchbase') { _%>
@@ -825,10 +827,12 @@ public class UserResourceIntTest <% if (databaseType === 'cassandra') { %>extend
         assertThat(userDTO.getImageUrl()).isEqualTo(DEFAULT_IMAGEURL);
         <%_ } _%>
         assertThat(userDTO.getLangKey()).isEqualTo(DEFAULT_LANGKEY);
-        <%_ if (databaseType !== 'cassandra') { _%>
+        <%_ if (databaseType === 'sql') { _%>
         assertThat(userDTO.getCreatedBy()).isEqualTo("John Doe (johndoe)");
-        assertThat(userDTO.getCreatedDate()).isEqualTo(user.getCreatedDate());
         assertThat(userDTO.getLastModifiedBy()).isEqualTo("John Doe (johndoe)");
+        <%_ } _%>
+        <%_ if (databaseType !== 'cassandra') { _%>
+        assertThat(userDTO.getCreatedDate()).isEqualTo(user.getCreatedDate());
         assertThat(userDTO.getLastModifiedDate()).isEqualTo(user.getLastModifiedDate());
         <%_ } _%>
         assertThat(userDTO.getAuthorities()).containsExactly(AuthoritiesConstants.USER);

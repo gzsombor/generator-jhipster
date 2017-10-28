@@ -19,6 +19,7 @@
 package <%=packageName%>.security.jwt;
 
 import io.github.jhipster.config.JHipsterProperties;
+import <%=packageName%>.security.DomainUser;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -77,12 +78,15 @@ public class TokenProvider {
         } else {
             validity = new Date(now + this.tokenValidityInMilliseconds);
         }
+        final DomainUser domainUser = (DomainUser) authentication.getPrincipal();
 
         return Jwts.builder()
             .setSubject(authentication.getName())
             .claim(AUTHORITIES_KEY, authorities)
             .signWith(SignatureAlgorithm.HS512, secretKey)
             .setExpiration(validity)
+            .claim("id", domainUser.getId())
+            .claim("lang", domainUser.getLanguage())
             .compact();
     }
 
@@ -97,7 +101,10 @@ public class TokenProvider {
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
-        User principal = new User(claims.getSubject(), "", authorities);
+        // Numbers stored as Integers, we need as Long
+        final Integer id = claims.get("id", Integer.class);
+        final String language = claims.get("lang", String.class);
+        User principal = new DomainUser(id != null ? id.longValue() : null, claims.getSubject(), "", authorities, language);
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }

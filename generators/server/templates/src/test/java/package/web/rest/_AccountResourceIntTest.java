@@ -31,6 +31,7 @@ import <%=packageName%>.security.AuthoritiesConstants;
 import <%=packageName%>.service.UserService;
     <%_ } _%>
 import <%=packageName%>.web.rest.errors.ExceptionTranslator;
+import <%=packageName%>.web.rest.TestUtil;
 
     <%_ if (applicationType === 'monolith') { _%>
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -156,7 +157,7 @@ public class AccountResourceIntTest <% if (databaseType === 'cassandra') { %>ext
             .build();
 
         restUserMockMvc.perform(get("/api/account")
-            .with(user(user.getLogin()).roles("ADMIN"))
+            .with(user(TestUtil.createUserDetails(user)))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))

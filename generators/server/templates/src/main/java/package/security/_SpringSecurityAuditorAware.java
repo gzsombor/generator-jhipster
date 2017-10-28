@@ -23,14 +23,23 @@ import <%=packageName%>.config.Constants;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
 
+<%_
+  noUserEntity = skipUserManagement && (applicationType !== 'monolith' || authenticationType !== 'oauth2');
+  auditorIdType = noUserEntity ? 'String' : pkType;
+ _%>
 /**
  * Implementation of AuditorAware based on Spring Security.
  */
 @Component
-public class SpringSecurityAuditorAware implements AuditorAware<Long> {
+public class SpringSecurityAuditorAware implements AuditorAware<<%= auditorIdType %>> {
 
     @Override
-    public Long getCurrentAuditor() {
+    public <%= auditorIdType %> getCurrentAuditor() {
+        <%_ if (noUserEntity) { _%>
+        final String userName = SecurityUtils.getCurrentUserLogin();
+        return userName != null ? userName : Constants.SYSTEM_ACCOUNT;
+        <%_ } else { _%>
         return SecurityUtils.getCurrentUserLoginId().orElse(Constants.SYSTEM_ACCOUNT_ID);
+        <%_ } _%>
     }
 }

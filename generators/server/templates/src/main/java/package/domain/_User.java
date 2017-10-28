@@ -380,6 +380,9 @@ public class User<% if (databaseType === 'sql' || databaseType === 'mongodb' || 
         this.persistentTokens = persistentTokens;
     }<% } %>
 
+<%_ if (databaseType === 'cassandra') { %>
+    @Transient
+<%_ } _%>
     public String getFullName() {
         return "" + firstName + " " + lastName + " (" + login + ')'; 
     }

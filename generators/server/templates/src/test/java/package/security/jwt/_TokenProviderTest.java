@@ -19,6 +19,7 @@
 package <%=packageName%>.security.jwt;
 
 import <%=packageName%>.security.AuthoritiesConstants;
+import <%=packageName%>.security.DomainUser;
 import io.github.jhipster.config.JHipsterProperties;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -100,7 +101,8 @@ public class TokenProviderTest {
     private Authentication createAuthentication() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.ANONYMOUS));
-        return new UsernamePasswordAuthenticationToken("anonymous", "anonymous", authorities);
+        DomainUser user = new DomainUser(null, "anonymous", "none", authorities, null);
+        return new UsernamePasswordAuthenticationToken(user, "anonymous", authorities);
     }
 
     private String createUnsupportedToken() {

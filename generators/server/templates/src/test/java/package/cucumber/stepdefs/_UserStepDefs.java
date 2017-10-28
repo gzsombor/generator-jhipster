@@ -45,7 +45,7 @@ public class UserStepDefs extends StepDefs {
     }
 
     @When("^I search user '(.*)'$")
-    public void i_search_user_admin(String userId) throws Throwable {
+    public void i_search_user_admin(Long userId) throws Throwable {
         actions = restUserMockMvc.perform(get("/api/users/" + userId)
                 .accept(MediaType.APPLICATION_JSON));
     }

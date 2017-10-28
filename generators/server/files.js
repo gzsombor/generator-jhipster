@@ -249,6 +249,7 @@ function writeFiles() {
             }
             this.template(`${SERVER_MAIN_SRC_DIR}package/security/_SecurityUtils.java`, `${javaDir}security/SecurityUtils.java`);
             this.template(`${SERVER_MAIN_SRC_DIR}package/security/_AuthoritiesConstants.java`, `${javaDir}security/AuthoritiesConstants.java`);
+            this.template(`${SERVER_MAIN_SRC_DIR}package/security/_DomainUser.java`, `${javaDir}security/DomainUser.java`);
 
             if (this.authenticationType === 'jwt') {
                 this.template(`${SERVER_MAIN_SRC_DIR}package/security/jwt/_TokenProvider.java`, `${javaDir}security/jwt/TokenProvider.java`);
@@ -282,7 +283,6 @@ function writeFiles() {
                 this.template(`${SERVER_MAIN_SRC_DIR}package/config/_OAuth2Configuration.java`, `${javaDir}config/OAuth2Configuration.java`);
                 this.template(`${SERVER_MAIN_SRC_DIR}package/security/_OAuth2AuthenticationSuccessHandler.java`, `${javaDir}security/OAuth2AuthenticationSuccessHandler.java`);
             } else {
-                this.template(`${SERVER_MAIN_SRC_DIR}package/security/_DomainUser.java`, `${javaDir}security/DomainUser.java`);
                 this.template(`${SERVER_MAIN_SRC_DIR}package/security/_DomainUserDetailsService.java`, `${javaDir}security/DomainUserDetailsService.java`);
                 this.template(`${SERVER_MAIN_SRC_DIR}package/security/_UserNotActivatedException.java`, `${javaDir}security/UserNotActivatedException.java`);
             }

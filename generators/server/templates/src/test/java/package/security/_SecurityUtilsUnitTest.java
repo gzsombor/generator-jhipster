@@ -39,6 +39,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 */
 public class SecurityUtilsUnitTest {
 
+<%_ if (pkType === 'String') { _%>
+    private static final String USER_ID = "testUserId";
+<%_ } else if (pkType === 'Long') { _%>
+    private static final Long USER_ID = 100L;
+<%_ } _%>
+
     @Test
     public void testgetCurrentUserLogin() {
         final SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
@@ -93,23 +99,23 @@ public class SecurityUtilsUnitTest {
 
     @Test
     public void testgetCurrentUserLoginWithId() {
-        TestUtil.setTestUser(1L, "admin");
+        TestUtil.setTestUser(USER_ID, "admin");
         final String login = SecurityUtils.getCurrentUserLogin();
         assertThat(login).isEqualTo("admin");
     }
 
     @Test
     public void testIsAuthenticatedWithId() {
-        TestUtil.setTestUser(1L, "admin");
+        TestUtil.setTestUser(USER_ID, "admin");
         final boolean isAuthenticated = SecurityUtils.isAuthenticated();
         assertThat(isAuthenticated).isTrue();
     }
 
     @Test
     public void testgetCurrentUserIdWithId() {
-        TestUtil.setTestUser(1L, "admin");
-        final Optional<Long> userId = SecurityUtils.getCurrentUserLoginId();
-        assertThat(userId).isEqualTo(Optional.of(1L));
+        TestUtil.setTestUser(USER_ID, "admin");
+        final Optional<<%= pkType %>> userId = SecurityUtils.getCurrentUserLoginId();
+        assertThat(userId).isEqualTo(Optional.of(USER_ID));
     }
 
 }

@@ -65,6 +65,16 @@ public final class SecurityUtils {
             .map(authentication -> (String) authentication.getCredentials());
     }
     <%_ } _%>
+    <%_
+    hasUserEntity = !skipUserManagement || (applicationType === 'monolith' && authenticationType === 'oauth2');
+    if (hasUserEntity) { _%>
+
+    /**
+     * @return the user id, or throws an exception if not available.
+     */
+    public static Long getCurrentLoginId() {
+        return getCurrentUserLoginId().get();
+    }
 
     /**
      * Get the id of the current user.
@@ -82,7 +92,7 @@ public final class SecurityUtils {
         }
         return Optional.empty();
     }
-
+    <%_ } _%>
     /**
      * Check if a user is authenticated.
      *
