@@ -215,6 +215,7 @@ public class AccountResource {
      *
      * @param key the activation key
      * @throws RuntimeException 500 (Internal Server Error) if the user couldn't be activated
+     * @return the activated user account
      */
     @GetMapping("/activate")
     @Timed
@@ -258,6 +259,7 @@ public class AccountResource {
      * @param userDTO the current user information
      * @throws EmailAlreadyUsedException 400 (Bad Request) if the email is already used
      * @throws RuntimeException 500 (Internal Server Error) if the user login wasn't found
+     * @return the modified account
      */
     @PostMapping("/account")
     @Timed
