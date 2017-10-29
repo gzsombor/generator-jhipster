@@ -1,6 +1,6 @@
 import { HttpParams } from '@angular/common/http';
 
-export const createRequestOption = (req?: any): HttpParams => {
+export const createRequestOption = (req?: any, queryParams?: any): HttpParams => {
     let options: HttpParams = new HttpParams();
     if (req) {
         Object.keys(req).forEach((key) => {
@@ -13,6 +13,7 @@ export const createRequestOption = (req?: any): HttpParams => {
                 options = options.append('sort', val);
             });
         }
+        
     }
     return options;
 };

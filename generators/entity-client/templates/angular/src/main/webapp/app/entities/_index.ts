@@ -22,5 +22,7 @@ export * from './<%= entityFileName %>.service';
 export * from './<%= entityFileName %>-dialog.component';
 export * from './<%= entityFileName %>-delete-dialog.component';
 export * from './<%= entityFileName %>-detail.component';
+export * from './<%= entityFileName %>-selection.component';
+export * from './<%= entityFileName %>-multi-selection.component';
 export * from './<%= entityFileName %>.component';
 export * from './<%= entityFileName %>.route';

@@ -147,6 +147,18 @@ const angularFiles = {
                     renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}-delete-dialog.component.html`
                 },
                 {
+                    file: 'entities/_entity-multi-selection.component.html',
+                    method: 'processHtml',
+                    template: true,
+                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}-multi-selection.component.html`
+                },
+                {
+                    file: 'entities/_entity-selection.component.html',
+                    method: 'processHtml',
+                    template: true,
+                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}-selection.component.html`
+                },
+                {
                     file: 'entities/_index.ts',
                     renameTo: generator => `entities/${generator.entityFolderName}/index.ts`
                 },
@@ -181,6 +193,14 @@ const angularFiles = {
                 {
                     file: 'entities/_entity.service.ts',
                     renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityServiceFileName}.service.ts`
+                },
+                {
+                    file: 'entities/_entity-multi-selection.component.ts',
+                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}-multi-selection.component.ts`
+                },
+                {
+                    file: 'entities/_entity-selection.component.ts',
+                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}-selection.component.ts`
                 },
                 {
                     file: 'entities/_entity-popup.service.ts',

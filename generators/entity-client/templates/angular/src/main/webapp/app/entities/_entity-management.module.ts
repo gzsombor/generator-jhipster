@@ -33,6 +33,8 @@ import {
     <%= entityAngularName %>PopupComponent,
     <%= entityAngularName %>DeletePopupComponent,
     <%= entityAngularName %>DeleteDialogComponent,
+    <%= entityAngularName %>SelectionComponent,
+    <%= entityAngularName %>MultiSelectionComponent,
     <%= entityInstance %>Route,
     <%= entityInstance %>PopupRoute,
     <%_ if (pagination === 'pagination' || pagination === 'pager') { _%>
@@ -61,6 +63,8 @@ const ENTITY_STATES = [
         <%= entityAngularName %>DeleteDialogComponent,
         <%= entityAngularName %>PopupComponent,
         <%= entityAngularName %>DeletePopupComponent,
+        <%= entityAngularName %>SelectionComponent,
+        <%= entityAngularName %>MultiSelectionComponent,
     ],
     entryComponents: [
         <%= entityAngularName %>Component,
@@ -76,6 +80,10 @@ const ENTITY_STATES = [
         <%= entityAngularName %>ResolvePagingParams,
         <%_ } _%>
     ],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+    exports: [
+        <%= entityAngularName %>SelectionComponent,
+        <%= entityAngularName %>MultiSelectionComponent,
+    ]
 })
 export class <%= angularXAppName %><%= entityAngularName %>Module {}

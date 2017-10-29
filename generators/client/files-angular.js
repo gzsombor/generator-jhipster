@@ -386,7 +386,9 @@ const files = {
                 'shared/login/_login.service.ts',
                 // alert service code
                 'shared/alert/_alert.component.ts',
-                'shared/alert/_alert-error.component.ts'
+                'shared/alert/_alert-error.component.ts',
+                // fields
+                'shared/fields/_base-form-field.component.ts'
             ]
         },
         {
