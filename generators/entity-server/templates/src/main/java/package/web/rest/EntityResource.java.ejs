@@ -49,6 +49,7 @@ import <%= packageName %>.repository.UserRepository;
 import <%= packageName %>.web.rest.errors.BadRequestAlertException;
 <%_ if (dto === 'mapstruct') { _%>
 import <%= packageName %>.service.dto.<%= dtoClass %>;
+import <%= packageName %>.service.dto.<%= asUpdateDto(entityClass) %>;
     <%_ if (service === 'no') { _%>
 import <%= packageName %>.service.mapper.<%= entityClass %>Mapper;
     <%_ } _%>
@@ -158,6 +159,7 @@ public class <%= entityClass %>Resource {
     <%_
     const instanceType = restClass;
     const instanceName = restInstance;
+    const updateType = (dto === 'mapstruct') ? asUpdateDto(entityClass) : asEntity(entityClass);
     const mapper = entityInstance  + 'Mapper';
     const entityToDtoReference = mapper + '::' + 'toDto';
     _%><%- include('../../common/inject_template', {viaService: viaService, constructorName: entityClass + 'Resource', queryService: jpaMetamodelFiltering, isUsingMapsId: isUsingMapsId, mapsIdAssoc: mapsIdAssoc, isController: true}); -%>
@@ -171,7 +173,7 @@ public class <%= entityClass %>Resource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/<%= entityApiUrl %>")
-    public <% if (reactive) { %>Mono<<% } %>ResponseEntity<<%= instanceType %>><% if (reactive) { %>><% } %> create<%= entityClass %>(<% if (validation) { %>@Valid <% } %>@RequestBody <%= instanceType %> <%= instanceName %>) throws URISyntaxException {
+    public <% if (reactive) { %>Mono<<% } %>ResponseEntity<<%= instanceType %>><% if (reactive) { %>><% } %> create<%= entityClass %>(<% if (validation) { %>@Valid <% } %>@RequestBody <%= updateType %> <%= instanceName %>) throws URISyntaxException {
         log.debug("REST request to save <%= entityClass %> : {}", <%= instanceName %>);
         if (<%= instanceName %>.get<%= primaryKey.nameCapitalized %>() != null) {
             throw new BadRequestAlertException("A new <%= entityInstance %> cannot already have an ID", ENTITY_NAME, "idexists");
@@ -220,12 +222,9 @@ public class <%= entityClass %>Resource {
      * or with status {@code 500 (Internal Server Error)} if the <%= instanceName %> couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/<%= entityApiUrl %>/{<%= primaryKey.name %>}")
-    public <% if (reactive) { %>Mono<<% } %>ResponseEntity<<%= instanceType %>><% if (reactive) { %>><% } %> update<%= entityClass %>(
-        @PathVariable(value = "<%= primaryKey.name %>", required = false) final <%= primaryKey.type %> <%= primaryKey.name %>,
-        <% if (validation) { %>@Valid <% } %>@RequestBody <%= instanceType %> <%= instanceName %>
-    ) throws URISyntaxException {
-        log.debug("REST request to update <%= entityClass %> : {}, {}", <%= primaryKey.name %>, <%= instanceName %>);
+    @PutMapping("/<%= entityApiUrl %>")
+    public <% if (reactive) { %>Mono<<% } %>ResponseEntity<<%= instanceType %>><% if (reactive) { %>><% } %> update<%= entityClass %>(<% if (validation) { %>@Valid <% } %>@RequestBody <%= updateType %> <%= instanceName %>) throws URISyntaxException {
+        log.debug("REST request to update <%= entityClass %> : {}", <%= instanceName %>);
         if (<%= instanceName %>.get<%= primaryKey.nameCapitalized %>() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }

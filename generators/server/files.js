@@ -1388,6 +1388,20 @@ const serverFiles = {
       templates: ['config/liquibase/data/authority.csv', 'config/liquibase/data/user_authority.csv'],
     },
     {
+      path: SERVER_MAIN_SRC_DIR,
+      templates: [
+        {
+          file: 'package/service/dto/UpdateIdDTO.java',
+          renameTo: generator => `${generator.javaDir}service/dto/UpdateIdDTO.java`,
+        },
+        {
+          file: 'package/service/dto/RequiredIdDTO.java',
+          renameTo: generator => `${generator.javaDir}service/dto/RequiredIdDTO.java`,
+        },
+
+      ],
+    },
+    {
       condition: generator => generator.authenticationType === 'oauth2',
       path: SERVER_MAIN_SRC_DIR,
       templates: [

@@ -1,0 +1,71 @@
+<%#
+ Copyright 2013-2021 the original author or authors from the JHipster project.
+
+ This file is part of the JHipster project, see https://www.jhipster.tech/
+ for more information.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      https://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-%>
+package <%= packageName %>.service.mapper;
+
+import java.util.Objects;
+<%_ if (primaryKey.type === 'UUID') { _%>
+import java.util.UUID;
+<%_ } _%>
+
+import javax.persistence.EntityManager;
+
+import org.springframework.stereotype.Service;
+
+import <%= packageName %>.domain.<%= asEntity(entityClass) %>;
+import <%= packageName %>.service.dto.RequiredIdDTO;
+import <%= packageName %>.service.dto.UpdateIdDTO;
+
+@Service
+public class <%= asEntity(entityClass) %>Loader {
+    private final EntityManager entityManager;
+
+    public <%= asEntity(entityClass) %>Loader(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
+    public <%= asEntity(entityClass) %> load(RequiredIdDTO<<%= primaryKey.type %>> dto) {
+        return loadNonNull(dto.getId());
+    }
+
+    public <%= asEntity(entityClass) %> load(UpdateIdDTO<<%= primaryKey.type %>> dto) {
+        if (dto != null && dto.getId() != null) {
+            return loadNonNull(dto.getId());
+        }
+        return null;
+    }
+
+    /**
+     * Loads <%= asEntity(entityClass) %> based on their id field.
+     * If id is null, it will return null.
+     * If there is no entity with the given id, it will throw an exception!
+     */
+    public <%= asEntity(entityClass) %> load(<%= primaryKey.type %> id) {
+        if (id != null) {
+            return loadNonNull(id);
+        }
+        return null;
+    }
+
+    /**
+     * Loads <%= asEntity(entityClass) %> based on their id field. If id is null or there is no entity with the given id, it will throw an exception!
+     */
+    public <%= asEntity(entityClass) %> loadNonNull(<%= primaryKey.type %> id) {
+        return Objects.requireNonNull(entityManager.find(<%= asEntity(entityClass) %>.class, id), "Missing <%= asEntity(entityClass) %> with id =" + id);
+    }
+}

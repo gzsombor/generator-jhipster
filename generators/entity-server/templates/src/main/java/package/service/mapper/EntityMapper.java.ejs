@@ -40,6 +40,7 @@ import java.util.Set;
 
 import <%= packageName %>.domain.*;
 import <%= packageName %>.service.dto.<%= dtoClass %>;
+import <%= packageName %>.service.dto.<%= asUpdateDto(entityClass) %>;
 
 import org.mapstruct.*;
 <%_ if (uuidMapMethod) { _%>
@@ -51,7 +52,11 @@ import java.util.UUID;
 /**
  * Mapper for the entity {@link <%= persistClass %>} and its DTO {@link <%= dtoClass %>}.
  */
-@Mapper(componentModel = "spring", uses = {<%= [...new Set(existingMappings.map(otherEntityNameCapitalized => otherEntityNameCapitalized + 'Mapper.class'))].join(', ') %>})
+<%_
+    const uses = existingMappings.map(otherEntityNameCapitalized => otherEntityNameCapitalized + 'Mapper.class')
+        .concat(existingMappings.map(otherEntityNameCapitalized => otherEntityNameCapitalized + 'Loader.class')).concat([entityClass + 'Loader.class']);
+_%>
+@Mapper(componentModel = "spring", uses = {<%= [...new Set(uses)].join(', ') %>})
 public interface <%= entityClass %>Mapper extends EntityMapper<<%= dtoClass %>, <%= persistClass %>> {
 <%_ /***** Basic dto mapping *****/
     if (!embedded) {
@@ -144,6 +149,8 @@ public interface <%= entityClass %>Mapper extends EntityMapper<<%= dtoClass %>, 
         <%_ } _%>
     <%- backReferenceDtoClass %> toDto<%= _.upperFirst(mapperName) %>(<%- backReferenceEntityClass %> <%= persistInstance %>);
     <%_ }; _%>
+
+    <%= asEntity(entityClass) %> updateEntity(<%= asUpdateDto(entityClass) %> update, @MappingTarget <%= asEntity(entityClass) %> entity);
 
     <%_ if (uuidMapMethod) { _%>
 

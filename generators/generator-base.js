@@ -2632,6 +2632,14 @@ templates: ${JSON.stringify(existingTemplates, null, 2)}`;
     return name + (this.dtoSuffix || this.jhipsterConfig.dtoSuffix || '');
   }
 
+  /**
+   * Construct the entity's update dto name by appending the Update dto suffix.
+   * @param {String} name entity name
+   */
+  asUpdateDto(name) {
+    return name + 'Update' + this.dtoSuffix;
+  }
+
   get needleApi() {
     if (this._needleApi === undefined || this._needleApi === null) {
       this._needleApi = new NeedleApi(this);

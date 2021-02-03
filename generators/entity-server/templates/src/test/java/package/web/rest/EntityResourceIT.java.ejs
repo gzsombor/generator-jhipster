@@ -110,6 +110,7 @@ import <%= packageName %>.service.<%= entityClass %>Service;
 <%_ } _%>
 <%_ if (dto === 'mapstruct') { _%>
 import <%= packageName %>.service.dto.<%= dtoClass %>;
+import <%= packageName %>.service.dto.<%= asUpdateDto(entityClass) %>;
 import <%= packageName %>.service.mapper.<%= entityClass %>Mapper;
 <%_ } _%>
 <%_ if (jpaMetamodelFiltering) { _%>

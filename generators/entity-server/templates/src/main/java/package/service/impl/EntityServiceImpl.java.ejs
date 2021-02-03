@@ -22,6 +22,7 @@ package <%= packageName %>.service<% if (service === 'serviceImpl') { %>.impl<% 
 const serviceClassName = service === 'serviceImpl' ? entityClass + 'ServiceImpl' : entityClass + 'Service';
 const instanceType = restClass;
 const instanceName = restInstance;
+const updateType = (dto === 'mapstruct') ? asUpdateDto(entityClass) : asEntity(entityClass);>>>>>>> Fix loading/updating the entities
 const optionalOrMono = (reactive === true) ? 'Mono' : 'Optional';
 const listOrFlux = (reactive === true) ? 'Flux' : 'List';
 const pageOrFlux = (reactive === true) ? 'Flux' : 'Page';
@@ -46,6 +47,7 @@ import <%= packageName %>.repository.search.<%= entityClass %>SearchRepository;
 <%_ } _%>
 <%_ if (dto === 'mapstruct') { _%>
 import <%= packageName %>.service.dto.<%= dtoClass %>;
+import <%= packageName %>.service.dto.<%= asUpdateDto(entityClass) %>;
 import <%= packageName %>.service.mapper.<%= entityClass %>Mapper;
 <%_ } _%>
 import org.slf4j.Logger;
@@ -114,6 +116,32 @@ public class <%= serviceClassName %><% if (service === 'serviceImpl') { %> imple
         log.debug("Request to save <%= entityClass %> : {}", <%= instanceName %>);
 <%- include('/partials/save_template', {asEntity, asDto, viaService: false, returnDirectly: true, isUsingMapsId: isUsingMapsId, mapsIdAssoc: mapsIdAssoc, isController: false}); -%>
     }
+
+<%_ if (dto === 'mapstruct') { _%>
+    <%_ if (service !== 'serviceImpl') { _%>
+        /**
+         * Save a <%= entityInstance %> from <%= updateType %>
+         *
+         * @param <%= instanceName %> the entity to save.
+         * @return the persisted entity.
+         */
+        <%_ } _%>
+        <%_ if (service === 'serviceImpl') { _%>
+        @Override
+        <%_ } _%>
+        public <% if (reactive) { %>Mono<<% } %><%= instanceType %><% if (reactive) { %>><% } %> save(<%= updateType %> updateEntity) {
+            log.debug("Request to save <%= entityClass %> : {}", updateEntity);
+            var id = updateEntity.get<%= primaryKey.nameCapitalized %>();
+            var entity = Optional.ofNullable(id).flatMap(<%= entityInstance %>Repository::findById).orElseGet(() -> {
+                var newEntity = new <%= entityClass %>();
+                newEntity.set<%= primaryKey.nameCapitalized %>(id);
+                return newEntity;
+            });
+            entity = <%= entityInstance %>Mapper.updateEntity(updateEntity, entity);
+            <%= entityInstance %>Repository.save(entity);
+            return <%= entityInstance %>Mapper.toDto(entity);
+        }
+<%_ } _%>
 
     <%_ if (service !== 'serviceImpl') { _%>
     /**
