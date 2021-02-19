@@ -101,6 +101,7 @@ public class <%= serviceClassName %><% if (service === 'serviceImpl') { %> imple
     private final Logger log = LoggerFactory.getLogger(<%= serviceClassName %>.class);
 <%- include('../../common/inject_template', {asEntity, asDto, viaService: false, constructorName: serviceClassName, queryService: false, isUsingMapsId: isUsingMapsId, mapsIdAssoc: mapsIdAssoc, isController: false}); -%>
 
+<%_ if (dto !== 'mapstruct') { _%>
     <%_ if (service !== 'serviceImpl') { _%>
     /**
      * Save a <%= entityInstance %>.
@@ -117,7 +118,7 @@ public class <%= serviceClassName %><% if (service === 'serviceImpl') { %> imple
 <%- include('/partials/save_template', {asEntity, asDto, viaService: false, returnDirectly: true, isUsingMapsId: isUsingMapsId, mapsIdAssoc: mapsIdAssoc, isController: false}); -%>
     }
 
-<%_ if (dto === 'mapstruct') { _%>
+<%_ } else { _%>
     <%_ if (service !== 'serviceImpl') { _%>
         /**
          * Save a <%= entityInstance %> from <%= updateType %>
