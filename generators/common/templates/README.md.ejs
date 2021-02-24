@@ -40,7 +40,7 @@ This application is configured for Service Discovery and Configuration with <% i
 To start your application in the dev profile, run:
 
 ```
-<% if (buildToolMaven) { %>./mvnw<% } %><% if (buildToolGradle) { %>./gradlew<% } %>
+<% if (buildToolMaven) { %>mvn<% } %><% if (buildToolGradle) { %>./gradlew<% } %>
 ```
 <%_ } _%>
 
@@ -87,7 +87,7 @@ auto-refreshes when files change on your hard drive.
 
 ```
 <%_ if (buildToolMaven) { _%>
-./mvnw
+mvnw
 <%_ } _%>
 <%_ if (buildToolGradle) { _%>
 ./gradlew -x webapp
@@ -269,7 +269,7 @@ update <%= CLIENT_MAIN_SRC_DIR %>app/app.module.ts
 [OpenAPI-Generator]() is configured for this application. You can generate API code from the `src/main/resources/swagger/api.yml` definition file by running:
     <%_ if (buildToolMaven) { _%>
 ```bash
-./mvnw generate-sources
+mvn generate-sources
 ```
     <%_ } _%>
     <%_ if (buildToolGradle) { _%>
@@ -292,7 +292,7 @@ To build the final jar and optimize the <%= baseName %> application for producti
 
 ```
 <%_ if (buildToolMaven) { _%>
-./mvnw -Pprod clean verify
+mvn -Pprod clean verify
 <%_ } _%>
 <%_ if (buildToolGradle) { _%>
 ./gradlew -Pprod clean bootJar
@@ -323,7 +323,7 @@ To package your application as a war in order to deploy it to an application ser
 
 ```
 <%_ if (buildToolMaven) { _%>
-./mvnw -Pprod,war clean verify
+mvn -Pprod,war clean verify
 <%_ } _%>
 <%_ if (buildToolGradle) { _%>
 ./gradlew -Pprod -Pwar clean bootWar
@@ -336,7 +336,7 @@ To launch your application's tests, run:
 
 ```
 <%_ if (buildToolMaven) { _%>
-./mvnw verify
+mvn verify
 <%_ } else { _%>
 ./gradlew test integrationTest jacocoTestReport
 <%_ } _%>
@@ -353,7 +353,7 @@ Unit tests are run by [Jest][]. They're located in [<%= CLIENT_TEST_SRC_DIR %>](
 
 <%_ if (protractorTests) { _%>
 UI end-to-end tests are powered by [Protractor][], which is built on top of WebDriverJS. They're located in [<%= CLIENT_TEST_SRC_DIR %>e2e](<%= CLIENT_TEST_SRC_DIR %>e2e)
-and can be run by starting Spring Boot in one terminal (`<% if (buildToolMaven) { %>./mvnw spring-boot:run<% } else { %>./gradlew bootRun<% } %>`) and running the tests (`<%= clientPackageManager %> run e2e`) in a second one.
+and can be run by starting Spring Boot in one terminal (`<% if (buildToolMaven) { %>mvn spring-boot:run<% } else { %>./gradlew bootRun<% } %>`) and running the tests (`<%= clientPackageManager %> run e2e`) in a second one.
 <%_ } _%>
 <%_ } _%>
 
@@ -383,13 +383,13 @@ Then, run a Sonar analysis:
 
 <%_ if (buildToolMaven) { _%>
 ```
-./mvnw -Pprod clean verify sonar:sonar
+mvn -Pprod clean verify sonar:sonar
 ```
 
 If you need to re-run the Sonar phase, please be sure to specify at least the `initialize` phase since Sonar properties are loaded from the sonar-project.properties file.
 
 ```
-./mvnw initialize sonar:sonar
+mvn initialize sonar:sonar
 ```
 <%_ } else if (buildToolGradle) { _%>
 ```
@@ -421,7 +421,7 @@ You can also fully dockerize your application and all the services that it depen
 To achieve this, first build a docker image of your app by running:
 
 ```
-<% if (buildToolMaven) { %>./mvnw -Pprod verify jib:dockerBuild<% } %><% if (buildToolGradle) { %>./gradlew bootJar -Pprod jibDockerBuild<% } %>
+<% if (buildToolMaven) { %>mvn -Pprod verify jib:dockerBuild<% } %><% if (buildToolGradle) { %>./gradlew bootJar -Pprod jibDockerBuild<% } %>
 ```
 
 Then run:

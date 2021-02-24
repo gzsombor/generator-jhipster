@@ -422,14 +422,14 @@ module.exports = class JHipsterServerGenerator extends BaseBlueprintGenerator {
         let e2ePackage = 'target/e2e';
         if (buildTool === 'maven') {
           scriptsStorage.set({
-            'backend:info': './mvnw -ntp enforcer:display-info --batch-mode',
-            'backend:doc:test': './mvnw -ntp javadoc:javadoc --batch-mode',
-            'backend:nohttp:test': './mvnw -ntp checkstyle:check --batch-mode',
-            'backend:start': './mvnw -P-webapp',
-            'java:jar': './mvnw -ntp verify -DskipTests --batch-mode',
-            'java:war': './mvnw -ntp verify -DskipTests --batch-mode -Pwar',
-            'java:docker': './mvnw -ntp verify -DskipTests jib:dockerBuild',
-            'backend:unit:test': `./mvnw -ntp -P-webapp verify --batch-mode ${javaCommonLog} ${javaTestLog}`,
+            'backend:info': 'mvn -ntp enforcer:display-info --batch-mode',
+            'backend:doc:test': 'mvn -ntp javadoc:javadoc --batch-mode',
+            'backend:nohttp:test': 'mvn -ntp checkstyle:check --batch-mode',
+            'backend:start': 'mvn -P-webapp',
+            'java:jar': 'mvn -ntp verify -DskipTests --batch-mode',
+            'java:war': 'mvn -ntp verify -DskipTests --batch-mode -Pwar',
+            'java:docker': 'mvn -ntp verify -DskipTests jib:dockerBuild',
+            'backend:unit:test': `mvn -ntp -P-webapp verify --batch-mode ${javaCommonLog} ${javaTestLog}`,
           });
         } else if (buildTool === 'gradle') {
           const excludeWebapp = this.jhipsterConfig.skipClient ? '' : '-x webapp';
