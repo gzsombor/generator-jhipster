@@ -23,6 +23,7 @@ import java.util.Objects;
 import java.util.UUID;
 <%_ } _%>
 
+import javax.annotation.Nonnull;
 import javax.persistence.EntityManager;
 
 import org.springframework.stereotype.Service;
@@ -65,7 +66,7 @@ public class <%= asEntity(entityClass) %>Loader {
     /**
      * Loads <%= asEntity(entityClass) %> based on their id field. If id is null or there is no entity with the given id, it will throw an exception!
      */
-    public <%= asEntity(entityClass) %> loadNonNull(<%= primaryKey.type %> id) {
+    @Nonnull public <%= asEntity(entityClass) %> loadNonNull(@Nonnull <%= primaryKey.type %> id) {
         return Objects.requireNonNull(entityManager.find(<%= asEntity(entityClass) %>.class, id), "Missing <%= asEntity(entityClass) %> with id =" + id);
     }
 }
