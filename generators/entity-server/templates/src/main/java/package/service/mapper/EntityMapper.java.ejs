@@ -150,6 +150,7 @@ public interface <%= entityClass %>Mapper extends EntityMapper<<%= dtoClass %>, 
     <%- backReferenceDtoClass %> toDto<%= _.upperFirst(mapperName) %>(<%- backReferenceEntityClass %> <%= persistInstance %>);
     <%_ }; _%>
 
+    @Mapping(target = "<%= primaryKey.name %>", ignore = true)
     <%= asEntity(entityClass) %> updateEntity(<%= asUpdateDto(entityClass) %> update, @MappingTarget <%= asEntity(entityClass) %> entity);
 
     <%_ if (uuidMapMethod) { _%>

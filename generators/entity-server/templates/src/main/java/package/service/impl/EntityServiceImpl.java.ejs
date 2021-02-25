@@ -22,7 +22,7 @@ package <%= packageName %>.service<% if (service === 'serviceImpl') { %>.impl<% 
 const serviceClassName = service === 'serviceImpl' ? entityClass + 'ServiceImpl' : entityClass + 'Service';
 const instanceType = restClass;
 const instanceName = restInstance;
-const updateType = (dto === 'mapstruct') ? asUpdateDto(entityClass) : asEntity(entityClass);>>>>>>> Fix loading/updating the entities
+const updateType = (dto === 'mapstruct') ? asUpdateDto(entityClass) : asEntity(entityClass);
 const optionalOrMono = (reactive === true) ? 'Mono' : 'Optional';
 const listOrFlux = (reactive === true) ? 'Flux' : 'List';
 const pageOrFlux = (reactive === true) ? 'Flux' : 'Page';
