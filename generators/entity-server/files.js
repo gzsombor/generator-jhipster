@@ -91,6 +91,20 @@ const serverFiles = {
       ],
     },
     {
+      condition: generator => generator.databaseType === 'sql' && !generator.embedded,
+      path: SERVER_MAIN_SRC_DIR,
+      templates: [
+        {
+          file: 'package/config/db/EntityIdType.java',
+          renameTo: generator => `${generator.packageFolder}/config/db/${generator.entityClass}IdType.java`,
+        },
+/*        {
+          file: 'package/domain/ids/EntityId.java',
+          renameTo: generator => `${generator.packageFolder}/domain/ids/${generator.entityClass}Id.java`,
+        },*/
+      ],
+    },
+    {
       condition: generator => generator.searchEngine === 'elasticsearch' && !generator.embedded,
       path: SERVER_MAIN_SRC_DIR,
       templates: [

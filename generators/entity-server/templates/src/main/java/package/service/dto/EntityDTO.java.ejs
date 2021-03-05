@@ -18,6 +18,11 @@
 -%>
 package <%= packageName %>.service.dto;
 
+<%_
+let customWrapperPkType = (primaryKey.type === 'UUID' && databaseType === 'sql');
+let pkType = customWrapperPkType ? asEntity(entityClass) + 'Id' : primaryKey.type;
+_%>
+
 import java.util.Objects;
 <%_ if (typeof javadoc != 'undefined') { _%>
 import io.swagger.annotations.ApiModel;

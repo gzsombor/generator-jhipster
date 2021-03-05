@@ -23,6 +23,8 @@ package <%= packageName %>.domain;
 let hasDto = dto === 'mapstruct';
 let hasTextBlob = false;
 let hasRelationship = relationships.length !== 0;
+let customWrapperPkType = (primaryKey.type === 'UUID' && databaseType === 'sql');
+let pkType = customWrapperPkType ? asEntity(entityClass) + 'Id' : primaryKey.type;
 _%>
 <%_
 for (const field of fields.filter(field => !field.transient)) {
@@ -184,6 +186,9 @@ public class <%= persistClass %> implements Serializable {
 <%_ if (!embedded) { _%>
     @Id
     <%_ if (databaseType === 'sql' && isUsingMapsId === false && !reactive && !primaryKey.composite) { _%>
+        <%_ if (customWrapperPkType) { _%>
+    @Type(type = "<%= packageName %>.config.db.<%= pkType %>Type")
+        <%_ } _%>
         <%_ if (primaryKey.fields[0].jpaGeneratedValue === 'identity') { _%>
     @GeneratedValue(strategy = GenerationType.IDENTITY)
         <%_ } else if (primaryKey.fields[0].jpaGeneratedValue === 'sequence') { _%>
@@ -197,7 +202,7 @@ public class <%= persistClass %> implements Serializable {
     <%_ } else if (databaseType === 'neo4j') { _%>
     @GeneratedValue(UUIDStringGenerator.class)
     <%_ } _%>
-    private <%= primaryKey.type %> <%= primaryKey.name %>;
+    private <%= pkType %> <%= primaryKey.name %>;
 
 <%_ } _%>
 <%_ for (const field of fields.filter(field => !field.id && !field.transient)) {
@@ -488,11 +493,11 @@ relationships.forEach((relationship, idx) => {
 }); _%>
     // jhipster-needle-entity-add-field - JHipster will add fields here
 <%_ if (!embedded) { _%>
-    public <%= primaryKey.type %> get<%= primaryKey.nameCapitalized %>() {
+    public <%= pkType %> get<%= primaryKey.nameCapitalized %>() {
         return <%= primaryKey.name %>;
     }
 
-    public void set<%= primaryKey.nameCapitalized %>(<%= primaryKey.type %> <%= primaryKey.name %>) {
+    public void set<%= primaryKey.nameCapitalized %>(<%= pkType %> <%= primaryKey.name %>) {
         this.<%= primaryKey.name %> = <%= primaryKey.name %>;
     }
 
