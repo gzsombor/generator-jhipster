@@ -126,7 +126,8 @@
     <logger name="springfox" level="WARN"/>
     <logger name="sun.rmi" level="WARN"/><% if (databaseType === 'sql') { %>
     <logger name="liquibase" level="WARN"/>
-    <logger name="LiquibaseSchemaResolver" level="INFO"/><% } %>
+    <logger name="LiquibaseSchemaResolver" level="INFO"/>
+    <logger name="Hibernate Types" level="WARN"/><% } %>
     <%_ if (applicationType === 'microservice' || applicationType === 'gateway') { _%>
     <logger name="sun.net.www" level="INFO"/>
     <%_ } _%>

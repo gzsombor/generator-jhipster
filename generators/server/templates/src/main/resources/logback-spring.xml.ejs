@@ -143,6 +143,7 @@
     <%_ if (databaseType === 'sql') { _%>
     <logger name="liquibase" level="WARN"/>
     <logger name="LiquibaseSchemaResolver" level="INFO"/>
+    <logger name="Hibernate Types" level="WARN"/>
     <%_ } _%>
     <logger name="springfox.documentation.schema.property" level="ERROR"/>
     <%_ if (applicationType === 'microservice' || applicationType === 'gateway' || cacheProvider === 'hazelcast') { _%>
